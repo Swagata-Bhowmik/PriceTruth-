@@ -1,0 +1,13 @@
+# Ignore unnecessary files
+*.docx
+*.pdf
+*.png
+*.jpeg
+*.jpg
+*.md
+*.py
+*.txt
+.vscode/
+
+# Keep only HTML files for prototype
+!README.md

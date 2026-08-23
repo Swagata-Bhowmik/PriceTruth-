@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Price Truth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary-soft:#6B8DBF;
+    --accent-peach:#FFB5A7;
+    --accent-peach-deep:#FF9A8B;
+    --success-mint:#B4E7CE;
+    --success-mint-deep:#4FA97C;
+    --warning-butter:#FFE8A3;
+    --lavender:#E0D4F7;
+
+    --cream:#FFFBF5;
+    --white:#FFFFFF;
+    --text-soft:#5A5A5A;
+    --text-dark:#3E3E3E;
+    --text-lighter:#9B9B9B;
+    --border-soft:#E8E4DD;
+
+    --bg:var(--cream);
+    --card-bg:var(--white);
+    --nav-bg:rgba(255,255,255,0.7);
+
+    --gradient-button:linear-gradient(135deg,#FFB5A7 0%,#FF9A8B 100%);
+    --shadow-soft:0 8px 40px rgba(107,80,60,0.08);
+    --shadow-lift:0 20px 50px rgba(107,80,60,0.14);
+    --radius-lg:22px;
+    --radius-md:14px;
+    --ease:cubic-bezier(.16,1,.3,1);
+
+    --sidebar-w:236px;
+    --topnav-h:76px;
+  }
+
+  [data-theme="dark"]{
+    --bg:#2B2A33;
+    --card-bg:#34333d;
+    --nav-bg:rgba(43,42,51,0.75);
+    --text-soft:#C9C6D6;
+    --text-dark:#F2F0F8;
+    --text-lighter:#8B879C;
+    --border-soft:#45434f;
+    --cream:#2B2A33;
+    --white:#34333d;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text-soft);
+    font-size:15.5px;
+    transition:background .35s var(--ease),color .35s var(--ease);
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,h3,h4{color:var(--text-dark);font-weight:700;letter-spacing:-0.01em;}
+  a{text-decoration:none;color:inherit;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;}
+  img{max-width:100%;display:block;}
+
+  /* ============ TOP NAV ============ */
+  .topnav{
+    position:fixed;top:0;left:0;right:0;height:var(--topnav-h);z-index:1000;
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    padding:0 28px;background:var(--nav-bg);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .topnav-left{display:flex;align-items:center;gap:14px;}
+  .back-home{font-size:14px;color:var(--primary-soft);font-weight:500;transition:opacity .2s;}
+  .back-home:hover{text-decoration:underline;}
+  .sep{color:var(--border-soft);}
+  .logo{font-weight:800;font-size:17px;letter-spacing:0.02em;color:var(--primary-soft);white-space:nowrap;}
+  .logo span{color:var(--accent-peach-deep);}
+
+  .topnav-search{
+    flex:1;max-width:460px;display:flex;align-items:center;gap:8px;
+    background:var(--card-bg);border:1.5px solid var(--border-soft);border-radius:100px;
+    padding:8px 8px 8px 18px;transition:border-color .25s,box-shadow .25s;
+  }
+  .topnav-search:focus-within{border-color:var(--primary-soft);box-shadow:0 0 0 4px rgba(107,141,191,0.14);}
+  .topnav-search input{flex:1;border:none;outline:none;background:transparent;font-size:14.5px;color:var(--text-dark);font-family:'Inter',sans-serif;}
+  .topnav-search input::placeholder{color:var(--text-lighter);}
+  .topnav-search button{
+    background:var(--gradient-button);border:none;color:#fff;width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:transform .2s var(--ease);
+  }
+  .topnav-search button:hover{transform:scale(1.08);}
+
+  .topnav-right{display:flex;align-items:center;gap:14px;}
+  .theme-toggle{
+    width:52px;height:28px;border-radius:100px;border:1.5px solid var(--border-soft);background:var(--card-bg);
+    position:relative;transition:background .3s;flex-shrink:0;
+  }
+  .theme-toggle .knob{
+    position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+    background:var(--gradient-button);transition:transform .3s var(--ease);
+    display:flex;align-items:center;justify-content:center;font-size:11px;
+  }
+  [data-theme="dark"] .theme-toggle .knob{transform:translateX(24px);}
+  .btn{
+    font-weight:600;font-size:14px;border:none;border-radius:100px;transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+  }
+  .btn-primary{
+    background:var(--gradient-button);color:#fff;padding:10px 22px;box-shadow:0 6px 18px rgba(255,154,139,0.35);
+  }
+  .btn-primary:hover{transform:translateY(-2px) scale(1.03);}
+  .btn-ghost{
+    background:transparent;border:1.5px solid var(--border-soft);color:var(--text-dark);padding:9px 18px;
+  }
+  .btn-ghost:hover{border-color:var(--primary-soft);}
+
+  /* ============ SIDEBAR ============ */
+  .sidebar{
+    position:fixed;top:var(--topnav-h);left:0;bottom:0;width:var(--sidebar-w);
+    background:var(--card-bg);border-right:1px solid var(--border-soft);
+    padding:26px 14px;z-index:900;overflow-y:auto;
+    transform:translateX(-100%);opacity:0;transition:transform .5s var(--ease),opacity .5s var(--ease),width .3s var(--ease);
+  }
+  .sidebar.in{transform:translateX(0);opacity:1;}
+  .sidebar-group-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-lighter);padding:10px 14px 6px;font-weight:600;}
+  .side-link{
+    display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;margin-bottom:2px;
+    color:var(--text-soft);font-size:14.5px;font-weight:500;transition:background .2s var(--ease),transform .2s var(--ease);
+  }
+  .side-link .ic{font-size:17px;width:20px;text-align:center;flex-shrink:0;}
+  .side-link:hover{background:rgba(255,181,167,0.12);transform:translateX(2px);}
+  .side-link.active{background:linear-gradient(135deg,rgba(255,181,167,0.25),rgba(255,181,167,0.12));color:var(--accent-peach-deep);font-weight:600;}
+  .sidebar .divider{height:1px;background:var(--border-soft);margin:14px 6px;}
+
+  /* ============ MAIN LAYOUT ============ */
+  .main-wrap{
+    margin-left:var(--sidebar-w);padding-top:var(--topnav-h);
+    min-height:100vh;transition:margin-left .3s var(--ease);
+  }
+  .main-inner{max-width:1280px;margin:0 auto;padding:34px 32px 80px;}
+
+  .page-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:28px;}
+  .page-head h1{font-size:28px;}
+  .page-head p{color:var(--text-lighter);font-size:14.5px;margin-top:4px;}
+  .greet-badge{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--primary-soft);background:rgba(107,141,191,0.1);padding:6px 14px;border-radius:100px;}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease);}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  /* ============ WIDGET GRID ============ */
+  .widget-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:28px;}
+  .card{
+    background:var(--card-bg);border-radius:var(--radius-lg);padding:26px 26px 22px;
+    box-shadow:var(--shadow-soft);border:1px solid var(--border-soft);
+    transition:transform .3s var(--ease),box-shadow .3s var(--ease);
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lift);}
+  .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+  .card-head h3{font-size:16.5px;display:flex;align-items:center;gap:9px;}
+  .card-head .more{color:var(--text-lighter);font-size:18px;cursor:pointer;}
+
+  /* --- Card 1: gauge + chart + shap --- */
+  .gauge-row{display:flex;align-items:center;gap:20px;margin-bottom:18px;}
+  .gauge-wrap{position:relative;width:104px;height:104px;flex-shrink:0;}
+  .gauge-wrap svg{transform:rotate(-90deg);}
+  .gauge-value{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .gauge-value .num{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--success-mint-deep);}
+  .gauge-label{font-size:13.5px;font-weight:600;color:var(--text-dark);}
+  .gauge-sub{font-size:12.5px;color:var(--text-lighter);margin-top:2px;}
+
+  .mini-chart{width:100%;height:70px;margin:14px 0 10px;}
+  .shap-mini-row{display:grid;grid-template-columns:120px 1fr 44px;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;}
+  .shap-mini-track{height:8px;background:var(--border-soft);border-radius:6px;overflow:hidden;}
+  .shap-mini-fill{height:100%;border-radius:6px;width:0;transition:width 1.1s var(--ease);}
+  .shap-mini-fill.pos{background:linear-gradient(90deg,var(--success-mint),var(--success-mint-deep));}
+  .shap-mini-val{font-family:'IBM Plex Mono',monospace;font-size:11.5px;text-align:right;color:var(--success-mint-deep);}
+
+  /* --- Card 2: timing --- */
+  .timing-badge{
+    background:linear-gradient(135deg,#FFF3D2,var(--warning-butter));border-radius:var(--radius-md);
+    padding:16px 18px;text-align:center;margin-bottom:14px;
+  }
+  .timing-badge .big{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;color:#8a6d1e;}
+  .timing-badge .small{font-size:12.5px;color:#a4884a;margin-top:2px;}
+  .timing-why{font-size:13px;color:var(--text-lighter);margin-bottom:12px;}
+  .conf-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .conf-track{flex:1;height:8px;background:var(--border-soft);border-radius:6px;overflow:hidden;}
+  .conf-fill{height:100%;width:0;background:linear-gradient(90deg,var(--primary-soft),#8fa9d1);border-radius:6px;transition:width 1.1s var(--ease);}
+  .conf-num{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--primary-soft);font-weight:600;}
+  .legend-row{display:flex;gap:16px;font-size:11.5px;color:var(--text-lighter);margin-top:8px;}
+  .legend-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;}
+
+  /* --- Card 3: shrink timeline --- */
+  .shrink-badge{
+    display:inline-flex;align-items:center;gap:6px;background:#FFE3DE;color:#B5544A;font-size:12px;font-weight:600;
+    padding:5px 12px;border-radius:100px;margin-bottom:14px;
+  }
+  .shrink-qty{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--text-dark);margin-bottom:18px;}
+  .mini-timeline{display:flex;align-items:flex-end;justify-content:space-between;position:relative;padding:0 4px;margin-bottom:16px;}
+  .mini-timeline::before{content:'';position:absolute;left:8px;right:8px;top:8px;height:2px;background:var(--border-soft);}
+  .tl-node{position:relative;text-align:center;flex:1;cursor:pointer;}
+  .tl-dot{width:16px;height:16px;border-radius:50%;background:var(--accent-peach-deep);margin:0 auto 8px;border:3px solid var(--card-bg);position:relative;z-index:2;transition:transform .2s var(--ease);}
+  .tl-node:hover .tl-dot{transform:scale(1.3);}
+  .tl-date{font-size:10.5px;color:var(--text-lighter);}
+  .tl-wt{font-size:13px;font-weight:600;color:var(--text-dark);margin-top:2px;}
+  .shrink-total{text-align:center;}
+  .shrink-total .num{font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:700;color:var(--accent-peach-deep);}
+  .shrink-total .lbl{font-size:12px;color:var(--text-lighter);}
+
+  /* --- Card 4: unit price --- */
+  .best-value-hero{margin-bottom:16px;}
+  .best-value-hero .num{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:700;color:var(--success-mint-deep);}
+  .best-value-hero .lbl{font-size:12.5px;color:var(--text-lighter);}
+  .up-bar-row{display:grid;grid-template-columns:1fr 90px;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px;}
+  .up-bar-track{height:20px;background:var(--border-soft);border-radius:8px;overflow:hidden;position:relative;}
+  .up-bar-fill{height:100%;border-radius:8px;width:0;transition:width 1s var(--ease);background:var(--text-lighter);opacity:.55;display:flex;align-items:center;padding-left:8px;font-size:10.5px;color:#fff;}
+  .up-bar-fill.best{background:linear-gradient(90deg,var(--success-mint),var(--success-mint-deep));opacity:1;font-weight:600;}
+  .savings-box{
+    background:rgba(180,231,206,0.35);border:1px solid rgba(180,231,206,0.8);border-radius:var(--radius-md);
+    padding:12px 14px;font-size:12.5px;color:#2E7A54;margin-top:14px;display:flex;gap:8px;align-items:flex-start;
+  }
+
+  /* ============ WIDE PRODUCT+SHAP ============ */
+  .wide-grid{display:grid;grid-template-columns:38% 62%;gap:22px;margin-bottom:28px;}
+  .product-card{display:flex;flex-direction:column;gap:16px;}
+  .product-image{
+    width:100%;aspect-ratio:1/1;border-radius:var(--radius-md);
+    background:linear-gradient(135deg,var(--warning-butter),var(--accent-peach));
+    display:flex;align-items:center;justify-content:center;font-size:64px;
+  }
+  .product-meta h4{font-size:19px;margin-bottom:4px;}
+  .meta-row{display:flex;justify-content:space-between;font-size:13.5px;padding:8px 0;border-bottom:1px solid var(--border-soft);color:var(--text-soft);}
+  .meta-row span:first-child{color:var(--text-lighter);}
+  .meta-row .stars{color:#F0B84A;}
+
+  .shap-full-row{display:grid;grid-template-columns:160px 1fr 60px;align-items:center;gap:14px;margin-bottom:14px;font-size:13.5px;}
+  .shap-full-track{height:13px;background:var(--border-soft);border-radius:8px;overflow:hidden;}
+  .shap-full-fill{height:100%;width:0;border-radius:8px;transition:width 1.1s var(--ease);}
+  .shap-full-fill.pos{background:linear-gradient(90deg,var(--success-mint),var(--success-mint-deep));}
+  .shap-full-fill.neg{background:linear-gradient(90deg,var(--accent-peach),var(--accent-peach-deep));}
+  .shap-full-val{font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:right;font-weight:600;}
+  .axis-label{font-size:11.5px;color:var(--text-lighter);display:flex;justify-content:space-between;margin-top:6px;padding-left:174px;}
+
+  /* ============ BOTTOM GRID ============ */
+  .bottom-grid{display:grid;grid-template-columns:34% 66%;gap:22px;}
+  .platform-list{display:flex;flex-direction:column;gap:10px;}
+  .platform-btn{
+    display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:var(--radius-md);
+    border:1.5px solid var(--border-soft);background:var(--card-bg);transition:all .25s var(--ease);
+  }
+  .platform-btn:hover{background:rgba(255,181,167,0.1);border-color:var(--accent-peach);transform:translateX(3px);}
+  .platform-btn .pname{display:flex;align-items:center;gap:12px;font-weight:600;color:var(--text-dark);font-size:14.5px;}
+  .platform-btn .picon{font-size:20px;}
+  .platform-btn .view{font-size:12.5px;color:var(--primary-soft);font-weight:600;}
+
+  .activity-item{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border-soft);}
+  .activity-item:last-of-type{border-bottom:none;}
+  .activity-left{display:flex;flex-direction:column;}
+  .activity-name{font-size:14px;font-weight:600;color:var(--text-dark);}
+  .activity-time{font-size:12px;color:var(--text-lighter);}
+  .activity-badge{font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:100px;}
+  .activity-badge.high{background:#DDF4E7;color:#2E7A54;}
+  .activity-badge.mid{background:#FFF3D2;color:#8A6D1E;}
+  .view-all{display:inline-block;margin-top:14px;font-size:13.5px;color:var(--primary-soft);font-weight:600;}
+  .view-all:hover{text-decoration:underline;}
+
+  /* ============ MOBILE BOTTOM NAV ============ */
+  .bottom-nav{display:none;}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:1199px){
+    :root{--sidebar-w:76px;}
+    .side-link span.label{display:none;}
+    .side-link{justify-content:center;}
+    .sidebar-group-label{display:none;}
+    .wide-grid{grid-template-columns:1fr;}
+    .bottom-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:900px){
+    .widget-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:768px){
+    .topnav-search{display:none;}
+    .sidebar{display:none;}
+    .main-wrap{margin-left:0;}
+    .main-inner{padding:24px 18px 100px;}
+    .bottom-nav{
+      display:flex;position:fixed;bottom:0;left:0;right:0;height:64px;background:var(--card-bg);
+      border-top:1px solid var(--border-soft);z-index:900;justify-content:space-around;align-items:center;
+      padding:0 4px;
+    }
+    .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text-lighter);flex:1;}
+    .bottom-nav a.active{color:var(--accent-peach-deep);}
+    .bottom-nav .ic{font-size:19px;}
+    .axis-label{padding-left:0;}
+    .shap-full-row{grid-template-columns:110px 1fr 46px;font-size:11.5px;gap:8px;}
+  }
+
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border-soft);border-radius:8px;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important;transition-duration:0.01ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="topnav-left">
+    <a href="index.html" class="back-home">← Back to Home</a>
+    <span class="sep">|</span>
+    <span class="logo">PRICE<span>TRUTH</span></span>
+  </div>
+
+  <div class="topnav-search">
+    <input type="text" placeholder="Search any product...">
+    <button aria-label="Search">🔍</button>
+  </div>
+
+  <div class="topnav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"><span class="knob">☀️</span></button>
+    <button class="btn btn-primary">Login / Signup</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-group-label">Main</div>
+  <a class="side-link active" href="#"><span class="ic">📊</span><span class="label">Dashboard</span></a>
+  <a class="side-link" href="#"><span class="ic">🎯</span><span class="label">Discount Checker</span></a>
+  <a class="side-link" href="#"><span class="ic">📈</span><span class="label">Buy Timing Signal</span></a>
+  <a class="side-link" href="#"><span class="ic">📉</span><span class="label">Shrink Timeline</span></a>
+  <a class="side-link" href="#"><span class="ic">🔍</span><span class="label">Live Product Lookup</span></a>
+  <a class="side-link" href="#"><span class="ic">⚖️</span><span class="label">Unit Price Comparator</span></a>
+  <div class="divider"></div>
+  <div class="sidebar-group-label">You</div>
+  <a class="side-link" href="#"><span class="ic">🕐</span><span class="label">History</span></a>
+  <a class="side-link" href="#"><span class="ic">⭐</span><span class="label">Saved Products</span></a>
+  <div class="divider"></div>
+  <a class="side-link" href="#"><span class="ic">⚙️</span><span class="label">Settings</span></a>
+  <a class="side-link" href="index.html#trust"><span class="ic">ℹ️</span><span class="label">About Us</span></a>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <div class="main-inner">
+
+    <div class="page-head reveal">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Everything Price Truth knows about your last search, in one view.</p>
+      </div>
+      <span class="greet-badge">Demo data · updates simulated</span>
+    </div>
+
+    <!-- 2x2 WIDGET GRID -->
+    <div class="widget-grid">
+
+      <!-- CARD 1: TRUE DISCOUNT CHECKER -->
+      <div class="card reveal">
+        <div class="card-head">
+          <h3>🎯 True Discount Checker</h3>
+          <span class="more">⋯</span>
+        </div>
+        <div class="gauge-row">
+          <div class="gauge-wrap">
+            <svg width="104" height="104" viewBox="0 0 104 104">
+              <circle cx="52" cy="52" r="44" fill="none" stroke="var(--border-soft)" stroke-width="10"/>
+              <circle id="gaugeCircle" cx="52" cy="52" r="44" fill="none" stroke="url(#gaugeGrad)" stroke-width="10"
+                stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="276.5"/>
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#B4E7CE"/>
+                  <stop offset="100%" stop-color="#4FA97C"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="gauge-value"><span class="num" id="gaugeNum">0%</span></div>
+          </div>
+          <div>
+            <div class="gauge-label">Likely a Genuine Discount</div>
+            <div class="gauge-sub">Genuineness score, ML-verified</div>
+          </div>
+        </div>
+
+        <svg class="mini-chart" viewBox="0 0 280 70" preserveAspectRatio="none">
+          <polyline id="priceLine" points="0,50 70,54 140,26 210,34 280,12" fill="none" stroke="var(--primary-soft)" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="500" stroke-dashoffset="500"/>
+        </svg>
+        <div class="axis-label" style="padding-left:0;"><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span></div>
+
+        <div style="margin-top:16px;">
+          <div class="shap-mini-row"><span>Price drop size</span><div class="shap-mini-track"><div class="shap-mini-fill pos" data-w="90"></div></div><span class="shap-mini-val">+0.45</span></div>
+          <div class="shap-mini-row"><span>Consistency</span><div class="shap-mini-track"><div class="shap-mini-fill pos" data-w="60"></div></div><span class="shap-mini-val">+0.30</span></div>
+          <div class="shap-mini-row"><span>Seller rating</span><div class="shap-mini-track"><div class="shap-mini-fill pos" data-w="30"></div></div><span class="shap-mini-val">+0.15</span></div>
+          <div class="shap-mini-row"><span># of reviews</span><div class="shap-mini-track"><div class="shap-mini-fill pos" data-w="20"></div></div><span class="shap-mini-val">+0.10</span></div>
+        </div>
+      </div>
+
+      <!-- CARD 2: BUY TIMING SIGNAL -->
+      <div class="card reveal">
+        <div class="card-head">
+          <h3>📈 Buy Timing Signal</h3>
+          <span class="more">⋯</span>
+        </div>
+        <div class="timing-badge">
+          <div class="big">10 DAYS TO WAIT</div>
+          <div class="small">Best estimated window to buy</div>
+        </div>
+        <div class="timing-why">💡 Prices likely to drop based on historical trend for this category.</div>
+
+        <div class="conf-row">
+          <span class="conf-num">78%</span>
+          <div class="conf-track"><div class="conf-fill" data-w="78"></div></div>
+        </div>
+
+        <svg class="mini-chart" viewBox="0 0 280 70" preserveAspectRatio="none">
+          <polyline points="0,20 90,30 180,26 280,24" fill="none" stroke="var(--primary-soft)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline id="predLine" points="180,26 220,42 280,52" fill="none" stroke="var(--accent-peach-deep)" stroke-width="2.5"
+            stroke-dasharray="6,6" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dashoffset="100"/>
+        </svg>
+        <div class="axis-label" style="padding-left:0;"><span>Aug</span><span>Sep</span><span>Oct</span></div>
+        <div class="legend-row">
+          <span><span class="legend-dot" style="background:var(--primary-soft);"></span>Actual price</span>
+          <span><span class="legend-dot" style="background:var(--accent-peach-deep);"></span>Predicted price</span>
+        </div>
+      </div>
+
+      <!-- CARD 3: SHRINKFLATION TIMELINE -->
+      <div class="card reveal">
+        <div class="card-head">
+          <h3>📉 Shrinkflation Timeline</h3>
+          <span class="more">⋯</span>
+        </div>
+        <span class="shrink-badge">⚠️ Shrinkflation Detected</span>
+        <div class="shrink-qty">200g → 180g → 150g <span style="color:var(--text-lighter);">(same price)</span></div>
+
+        <div class="mini-timeline">
+          <div class="tl-node" title="Photo evidence: Jan 2022 pack">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Jan 2022</div>
+            <div class="tl-wt">200g</div>
+          </div>
+          <div class="tl-node" title="Photo evidence: Jun 2023 pack">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Jun 2023</div>
+            <div class="tl-wt">180g</div>
+          </div>
+          <div class="tl-node" title="Photo evidence: Jan 2024 pack">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Jan 2024</div>
+            <div class="tl-wt">150g</div>
+          </div>
+        </div>
+
+        <div class="shrink-total">
+          <div class="num">25%</div>
+          <div class="lbl">Total shrinkage since 2022</div>
+        </div>
+      </div>
+
+      <!-- CARD 4: UNIT PRICE COMPARATOR -->
+      <div class="card reveal">
+        <div class="card-head">
+          <h3>⚖️ Unit Price Comparator</h3>
+          <span class="more">⋯</span>
+        </div>
+        <div class="best-value-hero">
+          <div class="num">₹25.00 <span style="font-size:14px;font-weight:500;color:var(--text-lighter);">/100g</span></div>
+          <div class="lbl">Best value — Option 2 (1kg)</div>
+        </div>
+
+        <div class="up-bar-row">
+          <div class="up-bar-track"><div class="up-bar-fill" data-w="93">Option 1 · 500g</div></div>
+          <span class="mono" style="text-align:right;">₹28.00</span>
+        </div>
+        <div class="up-bar-row">
+          <div class="up-bar-track"><div class="up-bar-fill best" data-w="83">Option 2 · 1kg ✅</div></div>
+          <span class="mono" style="text-align:right;color:var(--success-mint-deep);font-weight:600;">₹25.00</span>
+        </div>
+        <div class="up-bar-row">
+          <div class="up-bar-track"><div class="up-bar-fill" data-w="100">Option 3 · 200g</div></div>
+          <span class="mono" style="text-align:right;">₹30.00</span>
+        </div>
+
+        <div class="savings-box">
+          <span>💰</span>
+          <span>You save <strong>₹3.00 per 100g</strong> by choosing Option 2 (1kg) over Option 1.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT + SHAP WIDE SECTION -->
+    <div class="wide-grid">
+      <div class="card product-card reveal">
+        <div class="product-image">🍫</div>
+        <div class="product-meta">
+          <h4>Nutella Hazelnut Spread (750g)</h4>
+          <div class="meta-row"><span>Brand</span><span>Nutella</span></div>
+          <div class="meta-row"><span>Category</span><span>Spread</span></div>
+          <div class="meta-row"><span>Rating</span><span class="stars">★★★★★ <span style="color:var(--text-soft);">4.6</span></span></div>
+          <div class="meta-row"><span>Total reviews</span><span>12,542</span></div>
+          <div class="meta-row" style="border-bottom:none;"><span>Last updated</span><span>2 hours ago</span></div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-head">
+          <h3>SHAP Explainability <span style="font-weight:400;color:var(--text-lighter);font-size:13px;">— why this prediction?</span></h3>
+        </div>
+        <div class="shap-full-row">
+          <span>Price history consistency</span>
+          <div class="shap-full-track"><div class="shap-full-fill pos" data-w="90"></div></div>
+          <span class="shap-full-val" style="color:var(--success-mint-deep);">+0.45</span>
+        </div>
+        <div class="shap-full-row">
+          <span>Discount percentage</span>
+          <div class="shap-full-track"><div class="shap-full-fill pos" data-w="60"></div></div>
+          <span class="shap-full-val" style="color:var(--success-mint-deep);">+0.30</span>
+        </div>
+        <div class="shap-full-row">
+          <span>Number of reviews</span>
+          <div class="shap-full-track"><div class="shap-full-fill pos" data-w="30"></div></div>
+          <span class="shap-full-val" style="color:var(--success-mint-deep);">+0.15</span>
+        </div>
+        <div class="shap-full-row">
+          <span>Seller rating</span>
+          <div class="shap-full-track"><div class="shap-full-fill pos" data-w="16"></div></div>
+          <span class="shap-full-val" style="color:var(--success-mint-deep);">+0.08</span>
+        </div>
+        <div class="shap-full-row">
+          <span>Price volatility</span>
+          <div class="shap-full-track"><div class="shap-full-fill neg" data-w="10"></div></div>
+          <span class="shap-full-val" style="color:var(--accent-peach-deep);">−0.05</span>
+        </div>
+        <div class="axis-label"><span>−0.2</span><span>Impact on prediction</span><span>+0.5</span></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: PLATFORMS + ACTIVITY -->
+    <div class="bottom-grid">
+      <div class="card reveal">
+        <div class="card-head"><h3>Buy From Verified Platforms</h3></div>
+        <div class="platform-list">
+          <div class="platform-btn"><span class="pname"><span class="picon">🛒</span>Amazon</span><span class="view">View Product →</span></div>
+          <div class="platform-btn"><span class="pname"><span class="picon">🛍️</span>Flipkart</span><span class="view">View Product →</span></div>
+          <div class="platform-btn"><span class="pname"><span class="picon">👗</span>Myntra</span><span class="view">View Product →</span></div>
+          <div class="platform-btn"><span class="pname"><span class="picon">🧡</span>Meesho</span><span class="view">View Product →</span></div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-head"><h3>Recent Activity</h3></div>
+        <div class="activity-item">
+          <div class="activity-left"><span class="activity-name">Nutella 750g</span><span class="activity-time">Checked 2 hours ago</span></div>
+          <span class="activity-badge high">96%</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-left"><span class="activity-name">Lay's Classic 52g</span><span class="activity-time">Checked 5 hours ago</span></div>
+          <span class="activity-badge mid">62%</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-left"><span class="activity-name">Dove Soap 125g</span><span class="activity-time">Checked 1 day ago</span></div>
+          <span class="activity-badge high">88%</span>
+        </div>
+        <a href="#" class="view-all">View All History →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="#" class="active"><span class="ic">📊</span>Dashboard</a>
+  <a href="#"><span class="ic">🎯</span>Check</a>
+  <a href="#"><span class="ic">📈</span>Timing</a>
+  <a href="#"><span class="ic">⭐</span>Saved</a>
+  <a href="#"><span class="ic">⚙️</span>Settings</a>
+</nav>
+
+<script>
+  // ---- Theme toggle ----
+  const themeToggle = document.getElementById('themeToggle');
+  const knob = themeToggle.querySelector('.knob');
+  themeToggle.addEventListener('click', () => {
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    if(isDark){
+      document.body.removeAttribute('data-theme');
+      knob.textContent = '☀️';
+    } else {
+      document.body.setAttribute('data-theme','dark');
+      knob.textContent = '🌙';
+    }
+  });
+
+  // ---- Sidebar slide-in on load ----
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('sidebar').classList.add('in'), 150);
+  });
+
+  // ---- Reveal on load (sequential, dashboard isn't really scrollable-first) ----
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry,i) => {
+      if(entry.isIntersecting){
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        io.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.1});
+  revealEls.forEach(el => io.observe(el));
+
+  // ---- Animate gauge ----
+  function animateGauge(){
+    const circle = document.getElementById('gaugeCircle');
+    const num = document.getElementById('gaugeNum');
+    const circumference = 276.5;
+    const target = 96;
+    const offset = circumference - (circumference * target / 100);
+    circle.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.16,1,.3,1)';
+    requestAnimationFrame(() => circle.style.strokeDashoffset = offset);
+    let cur = 0;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min((now-start)/1400,1);
+      cur = Math.round(target * (1-Math.pow(1-p,3)));
+      num.textContent = cur + '%';
+      if(p<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // ---- Animate line charts ----
+  function animateLine(id){
+    const line = document.getElementById(id);
+    if(!line) return;
+    const len = line.getTotalLength ? line.getTotalLength() : 500;
+    line.style.strokeDasharray = len;
+    line.style.strokeDashoffset = len;
+    requestAnimationFrame(() => {
+      line.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.16,1,.3,1)';
+      line.style.strokeDashoffset = 0;
+    });
+  }
+
+  // ---- Trigger fills / bars ----
+  function animateFills(){
+    document.querySelectorAll('[data-w]').forEach(el => {
+      const w = el.getAttribute('data-w');
+      requestAnimationFrame(() => el.style.width = w + '%');
+    });
+  }
+
+  // Run all widget animations after a short delay so they feel orchestrated
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      animateGauge();
+      animateLine('priceLine');
+      animateFills();
+    }, 350);
+    setTimeout(() => {
+      const pred = document.getElementById('predLine');
+      if(pred){ pred.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.16,1,.3,1)'; pred.style.strokeDashoffset = 0; }
+    }, 700);
+  });
+
+  // ---- Timeline dot click -> photo evidence popup ----
+  document.querySelectorAll('.tl-node').forEach(node => {
+    node.addEventListener('click', () => {
+      alert('📸 Photo evidence for ' + node.querySelector('.tl-date').textContent + ': ' + node.querySelector('.tl-wt').textContent + ' pack (simulated for demo).');
+    });
+  });
+
+  // ---- Sidebar active state ----
+  document.querySelectorAll('.side-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      if(link.getAttribute('href') === '#'){
+        e.preventDefault();
+        document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  });
+
+  // ---- Search demo ----
+  document.querySelector('.topnav-search button').addEventListener('click', () => {
+    const val = document.querySelector('.topnav-search input').value;
+    if(val.trim()) alert('Searching for "' + val + '" — this is a UI demo, no live search is connected.');
+  });
+</script>
+</body>
+</html>
