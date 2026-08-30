@@ -21,7 +21,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Create `app/core/config.py` using `pydantic-settings` to read `DATABASE_URL`, `REDIS_URL`, `OFF_BASE_URL`, `OFF_VERSION`, and `CORS_ALLOWED_ORIGIN` from environment variables (no hardcoded endpoints or secrets)
     - _Requirements: 13.1, 13.4, 18.6_
 
-  - [ ] 1.2 Implement the structured error payload and central exception handlers
+  - [x] 1.2 Implement the structured error payload and central exception handlers
     - Create `app/core/errors.py` with an `ErrorPayload` model producing `{error: {code, message, status, details}}`
     - Register a central exception handler in `main.py` that converts validation errors, domain errors, and unhandled errors into the single payload shape; add a DB-unreachable path returning a 503 with a retry message
     - _Requirements: 15.3, 16.4_
@@ -30,7 +30,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 23: All error responses use the structured payload**
     - **Validates: Requirements 15.3**
 
-  - [ ] 1.4 Configure structured logging and implement DB session + Redis client
+  - [x] 1.4 Configure structured logging and implement DB session + Redis client
     - Create `app/core/logging.py` (structured logging) used to record validation rejections
     - Create `app/db/session.py` (engine, session factory, `get_db` dependency) and `app/db/redis_client.py` (get/set with TTL), both reading connection details from settings
     - _Requirements: 15.4, 16.4, 17.5_
@@ -114,7 +114,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 6. Unit Price Comparator service and endpoint
-  - [ ] 6.1 Implement the unit price comparator service
+  - [x] 6.1 Implement the unit price comparator service
     - In `app/services/unit_price_service.py`, convert each variant's pack quantity to a common standard unit (g/ml; kg to g and l to ml multiply by 1000), compute unit price = price / standardized quantity, mark the lowest as best value, and exclude variants with missing/non-positive quantity into an `excluded` list with a reason
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 

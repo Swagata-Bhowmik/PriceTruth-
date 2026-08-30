@@ -2,9 +2,14 @@
 Price Truth - FastAPI Main Application Entry Point
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import OperationalError
+
+from app.core.errors import AppError, ErrorPayload
 
 app = FastAPI(
     title="Price Truth API",
@@ -22,6 +27,64 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ---------------------------------------------------------------------------
+# Central exception handlers
+#
+# Every error the API returns is serialized into the single structured payload
+# defined in app.core.errors, so all failures share one contract (Req 15.3).
+# A dedicated handler maps a database-connectivity failure to a 503 with a
+# retry message instead of surfacing an unhandled error (Req 16.4).
+# ---------------------------------------------------------------------------
+
+
+@app.exception_handler(AppError)
+async def handle_app_error(request: Request, exc: AppError) -> JSONResponse:
+    """Translate a raised domain error into the structured payload at its status."""
+    payload = exc.to_payload()
+    return JSONResponse(status_code=exc.status, content=payload.model_dump())
+
+
+@app.exception_handler(RequestValidationError)
+async def handle_validation_error(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    """Return request-validation failures as a 422 structured payload (Req 15.3)."""
+    payload = ErrorPayload.build(
+        code="VALIDATION_ERROR",
+        message="One or more request parameters failed validation.",
+        status=422,
+        details={"errors": jsonable_encoder(exc.errors())},
+    )
+    return JSONResponse(status_code=payload.error.status, content=payload.model_dump())
+
+
+@app.exception_handler(OperationalError)
+async def handle_db_operational_error(
+    request: Request, exc: OperationalError
+) -> JSONResponse:
+    """Map a database-connectivity failure to a 503 with a retry message (Req 16.4)."""
+    payload = ErrorPayload.build(
+        code="DATABASE_UNAVAILABLE",
+        message=(
+            "The service is temporarily unable to reach its database. "
+            "Please try again in a few moments."
+        ),
+        status=503,
+    )
+    return JSONResponse(status_code=payload.error.status, content=payload.model_dump())
+
+
+@app.exception_handler(Exception)
+async def handle_unexpected_error(request: Request, exc: Exception) -> JSONResponse:
+    """Catch-all: convert any otherwise-unhandled error into a 500 payload (Req 15.3)."""
+    payload = ErrorPayload.build(
+        code="INTERNAL_SERVER_ERROR",
+        message="An unexpected internal error occurred.",
+        status=500,
+    )
+    return JSONResponse(status_code=payload.error.status, content=payload.model_dump())
 
 
 @app.get("/")
