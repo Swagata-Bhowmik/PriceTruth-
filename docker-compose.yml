@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: price-truth-db
+    restart: always
+    environment:
+      POSTGRES_USER: pricetruth
+      POSTGRES_PASSWORD: dev_password_change_in_prod
+      POSTGRES_DB: pricetruth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - price-truth-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: price-truth-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - price-truth-network
+
+  # Backend API (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: price-truth-backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://pricetruth:dev_password_change_in_prod@db:5432/pricetruth_db
+      REDIS_URL: redis://redis:6379
+      ENV: development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./data:/data
+    depends_on:
+      - db
+      - redis
+    networks:
+      - price-truth-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: price-truth-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - price-truth-network
+    command: npm run dev -- --host
+
+volumes:
+  postgres_data:
+
+networks:
+  price-truth-network:
+    driver: bridge

@@ -1,0 +1,77 @@
+# FastAPI Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Machine Learning
+scikit-learn==1.3.2
+xgboost==2.0.2
+shap==0.43.0
+pandas==2.1.4
+numpy==1.26.2
+prophet==1.1.5
+statsmodels==0.14.1
+
+# Data Processing
+openpyxl==3.1.2
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+alembic==1.13.0
+
+# Caching
+redis==5.0.1
+
+# HTTP Client
+httpx==0.25.2
+requests==2.31.0
+beautifulsoup4==4.12.2
+selenium==4.16.0
+lxml==4.9.4
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Utilities
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2
+
+# Code Quality
+black==23.12.1
+flake8==6.1.0
+mypy==1.7.1
+isort==5.13.2
+
+# API Documentation
+python-multipart==0.0.6
+
+# Jupyter (for notebooks)
+jupyter==1.0.0
+notebook==7.0.6
+ipykernel==6.27.1
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.18.0
+
+# Date/Time
+python-dateutil==2.8.2
+
+# Job Scheduling (if needed)
+apscheduler==3.10.4
+
+# CORS
+fastapi-cors==0.0.6
+
+# Validation
+email-validator==2.1.0
