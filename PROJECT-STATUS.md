@@ -126,3 +126,12 @@ Phases 1-12 from PROGRESS.md are all pending:
 ## 7. NEXT STEP
 
 Before writing more code, we are creating a formal development spec (requirements -> design -> tasks) so the build is planned bit-by-bit, verified at each step, and committed incrementally. This document will be updated as each phase closes.
+
+---
+
+## BUILD ENVIRONMENT NOTE (Task 1.1 - critical)
+
+- The backend virtualenv is **Python 3.11.9**, NOT the machine default 3.14.3. Reason: the pinned ML stack (numpy 1.26, pandas, scikit-learn, xgboost, shap, prophet, statsmodels) has no Python 3.14 wheels.
+- venv location: `backend\venv`  ->  use `backend\venv\Scripts\python.exe` (or activate the venv) for ALL backend commands, tests, and scripts. Bare `python` (3.14) will fail to import the ML libs.
+- All backend dependencies installed successfully at their pinned versions.
+- Config: `backend/app/core/config.py` (pydantic-settings) reads DATABASE_URL, REDIS_URL, OFF_BASE_URL, OFF_VERSION, CORS_ALLOWED_ORIGIN from env; template in `backend/.env.example`.
