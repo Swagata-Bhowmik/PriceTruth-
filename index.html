@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Price Truth — Is your discount actually real?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary-soft:#6B8DBF;
+    --accent-peach:#FFB5A7;
+    --accent-peach-deep:#FF9A8B;
+    --success-mint:#B4E7CE;
+    --warning-butter:#FFE8A3;
+    --lavender:#E0D4F7;
+
+    --cream:#FFFBF5;
+    --white:#FFFFFF;
+    --text-soft:#5A5A5A;
+    --text-dark:#3E3E3E;
+    --text-lighter:#9B9B9B;
+    --border-soft:#E8E4DD;
+
+    --gradient-hero:linear-gradient(135deg,#E0D4F7 0%,#FFE8A3 50%,#FFB5A7 100%);
+    --gradient-card:linear-gradient(135deg,#FFFFFF 0%,#FFFBF5 100%);
+    --gradient-button:linear-gradient(135deg,#FFB5A7 0%,#FF9A8B 100%);
+
+    --shadow-soft:0 8px 40px rgba(107,80,60,0.08);
+    --shadow-lift:0 20px 50px rgba(107,80,60,0.14);
+    --radius-lg:24px;
+    --radius-md:16px;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--cream);
+    color:var(--text-soft);
+    font-size:18px;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,h3{color:var(--text-dark);font-weight:700;letter-spacing:-0.02em;}
+  a{text-decoration:none;color:inherit;}
+  img{max-width:100%;display:block;}
+  .container{max-width:1200px;margin:0 auto;padding:0 32px;}
+  section{padding:110px 0;position:relative;}
+  .gradient-text{
+    background:linear-gradient(135deg,var(--accent-peach-deep),var(--lavender));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .eyebrow{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:13px;
+    letter-spacing:0.12em;text-transform:uppercase;color:var(--primary-soft);
+    background:rgba(107,141,191,0.1);padding:6px 14px;border-radius:100px;margin-bottom:20px;
+  }
+  .section-title{font-size:44px;text-align:center;margin-bottom:16px;}
+  .section-sub{text-align:center;color:var(--text-lighter);font-size:19px;max-width:600px;margin:0 auto 60px;}
+
+  /* reveal on scroll */
+  .reveal{opacity:0;transform:translateY(36px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+  .reveal-delay-1{transition-delay:.1s;}
+  .reveal-delay-2{transition-delay:.2s;}
+  .reveal-delay-3{transition-delay:.3s;}
+  .reveal-delay-4{transition-delay:.4s;}
+  .reveal-delay-5{transition-delay:.5s;}
+
+  /* progress bar */
+  #scroll-progress{
+    position:fixed;top:0;left:0;height:3px;background:var(--gradient-button);
+    z-index:9999;width:0%;transition:width .1s linear;
+  }
+
+  /* ===== NAV ===== */
+  nav{
+    position:fixed;top:20px;left:50%;transform:translateX(-50%);
+    width:calc(100% - 48px);max-width:1100px;z-index:1000;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 24px;border-radius:100px;
+    background:rgba(255,255,255,0.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.6);
+    box-shadow:0 8px 30px rgba(107,80,60,0.06);
+    transition:box-shadow .3s var(--ease),background .3s var(--ease);
+  }
+  nav.scrolled{background:rgba(255,255,255,0.85);box-shadow:0 8px 30px rgba(107,80,60,0.12);}
+  .logo{font-weight:800;font-size:18px;letter-spacing:0.02em;color:var(--primary-soft);}
+  .logo span{color:var(--accent-peach-deep);}
+  .nav-links{display:flex;align-items:center;gap:32px;}
+  .nav-links a{font-size:15px;font-weight:500;color:var(--text-soft);position:relative;padding:4px 0;}
+  .nav-links a::after{
+    content:'';position:absolute;left:0;bottom:-2px;width:0;height:2px;background:var(--accent-peach-deep);
+    transition:width .3s var(--ease);
+  }
+  .nav-links a:hover::after{width:100%;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'Inter',sans-serif;font-weight:600;font-size:15px;
+    border:none;cursor:pointer;border-radius:100px;
+    transition:transform .25s var(--ease),box-shadow .25s var(--ease),filter .25s var(--ease);
+  }
+  .btn-primary{
+    background:var(--gradient-button);color:#fff;padding:12px 26px;
+    box-shadow:0 8px 24px rgba(255,154,139,0.4);
+  }
+  .btn-primary:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 12px 30px rgba(255,154,139,0.55);}
+  .btn-ghost{
+    background:transparent;border:1.5px solid var(--border-soft);color:var(--text-dark);padding:10px 22px;
+  }
+  .btn-ghost:hover{border-color:var(--primary-soft);background:rgba(107,141,191,0.06);}
+  .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
+  .burger span{width:22px;height:2px;background:var(--text-dark);border-radius:2px;}
+
+  /* ===== HERO ===== */
+  .hero{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--gradient-hero);position:relative;overflow:hidden;padding-top:120px;
+    text-align:center;
+  }
+  .hero::before, .hero::after{
+    content:'';position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;
+  }
+  .hero::before{width:420px;height:420px;background:var(--accent-peach);top:-120px;left:-100px;animation:float1 12s ease-in-out infinite;}
+  .hero::after{width:380px;height:380px;background:var(--lavender);bottom:-140px;right:-100px;animation:float2 14s ease-in-out infinite;}
+  @keyframes float1{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,30px);}}
+  @keyframes float2{0%,100%{transform:translate(0,0);}50%{transform:translate(-30px,-40px);}}
+
+  .hero-inner{position:relative;z-index:2;max-width:820px;margin:0 auto;padding:0 24px;}
+  .hero h1{font-size:clamp(40px,7vw,76px);line-height:1.05;margin-bottom:24px;}
+  .hero p.sub{font-size:22px;color:var(--text-soft);max-width:640px;margin:0 auto 44px;}
+
+  .hero-search{
+    display:flex;align-items:center;gap:8px;max-width:620px;margin:0 auto 36px;
+    background:rgba(255,255,255,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.8);border-radius:100px;padding:8px 8px 8px 26px;
+    box-shadow:var(--shadow-lift);animation:bob 5s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+  .hero-search input{
+    flex:1;border:none;background:transparent;outline:none;font-size:16px;
+    font-family:'Inter',sans-serif;color:var(--text-dark);
+  }
+  .hero-search input::placeholder{color:var(--text-lighter);}
+  .hero-search button{white-space:nowrap;padding:14px 26px;}
+
+  .trust-badges{display:flex;justify-content:center;gap:36px;flex-wrap:wrap;font-size:15px;font-weight:500;color:var(--text-soft);}
+  .trust-badges span{display:inline-flex;align-items:center;gap:8px;}
+
+  .scroll-indicator{
+    position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13px;color:var(--text-lighter);
+    z-index:2;
+  }
+  .scroll-indicator .arrow{width:20px;height:20px;border-right:2px solid var(--text-lighter);border-bottom:2px solid var(--text-lighter);transform:rotate(45deg);animation:arrowbounce 1.8s ease-in-out infinite;}
+  @keyframes arrowbounce{0%,100%{transform:rotate(45deg) translate(0,0);}50%{transform:rotate(45deg) translate(6px,6px);}}
+
+  /* ===== STATS ===== */
+  .stats{background:var(--success-mint);padding:80px 0;}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center;}
+  .stat-num{font-family:'IBM Plex Mono',monospace;font-size:42px;font-weight:600;
+    background:linear-gradient(135deg,#2e6b4f,var(--primary-soft));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .stat-label{margin-top:8px;font-size:15px;color:#3f6b57;font-weight:500;}
+
+  /* ===== PROBLEM ===== */
+  .problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:20px;}
+  .problem-card{
+    background:var(--white);border-radius:var(--radius-lg);padding:44px;
+    box-shadow:var(--shadow-soft);transition:transform .35s var(--ease),box-shadow .35s var(--ease);
+    border:1px solid var(--border-soft);
+  }
+  .problem-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lift);}
+  .problem-card .icon{font-size:44px;margin-bottom:18px;}
+  .problem-card h3{font-size:24px;margin-bottom:14px;}
+  .problem-card.pink{background:linear-gradient(160deg,#fff 60%,#FFF1EE 100%);}
+  .problem-card.blue{background:linear-gradient(160deg,#fff 60%,#F1EEFB 100%);}
+  .price-demo{margin:20px 0;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:20px;flex-wrap:wrap;}
+  .price-demo .strike{color:var(--text-lighter);text-decoration:line-through;text-decoration-color:var(--accent-peach-deep);text-decoration-thickness:2px;}
+  .price-demo .final{color:var(--accent-peach-deep);font-weight:600;}
+  .shrink-timeline-mini{display:flex;gap:10px;margin-top:20px;align-items:flex-end;}
+  .shrink-timeline-mini .bar{background:var(--primary-soft);border-radius:6px 6px 0 0;width:34px;opacity:.85;}
+  .shrink-timeline-mini .bar-wrap{text-align:center;font-size:12px;color:var(--text-lighter);}
+
+  /* ===== DEMO ===== */
+  .demo-box{
+    display:grid;grid-template-columns:40% 60%;gap:0;
+    background:rgba(255,255,255,0.7);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,0.8);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-lift);overflow:hidden;
+  }
+  .demo-form{padding:48px 40px;background:linear-gradient(160deg,rgba(224,212,247,0.3),rgba(255,251,245,0.5));}
+  .demo-results{padding:48px 40px;min-height:520px;}
+  .field{margin-bottom:22px;}
+  .field label{display:block;font-size:14px;font-weight:600;color:var(--text-dark);margin-bottom:8px;}
+  .field .input-wrap{position:relative;}
+  .field select,.field input[type=number]{
+    width:100%;padding:14px 16px;border-radius:var(--radius-md);border:1.5px solid var(--border-soft);
+    background:var(--white);font-family:'Inter',sans-serif;font-size:16px;color:var(--text-dark);
+    outline:none;transition:border-color .25s,box-shadow .25s;appearance:none;
+  }
+  .field input[type=number]{padding-left:34px;font-family:'IBM Plex Mono',monospace;}
+  .field .rupee{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-lighter);font-family:'IBM Plex Mono',monospace;}
+  .field select:focus, .field input:focus{border-color:var(--primary-soft);box-shadow:0 0 0 4px rgba(107,141,191,0.15);}
+  .demo-form .btn-primary{width:100%;justify-content:center;padding:16px;font-size:16px;margin-top:8px;}
+
+  .verdict-banner{
+    background:linear-gradient(135deg,#FFE3DE,#FFD2C8);border-radius:var(--radius-md);
+    padding:26px 28px;display:flex;align-items:center;gap:18px;margin-bottom:32px;
+    opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease),transform .5s var(--ease);
+  }
+  .verdict-banner.show{opacity:1;transform:translateY(0);}
+  .verdict-banner .vicon{font-size:34px;}
+  .verdict-banner h4{font-size:20px;color:#8a3d2f;}
+  .verdict-banner p{font-size:14px;color:#a4574a;margin-top:2px;}
+  .confidence-badge{
+    margin-left:auto;background:#fff;padding:6px 14px;border-radius:100px;font-family:'IBM Plex Mono',monospace;
+    font-weight:600;font-size:13px;color:#8a3d2f;white-space:nowrap;
+  }
+
+  .shap-title{font-size:16px;font-weight:600;color:var(--text-dark);margin-bottom:16px;}
+  .shap-row{display:grid;grid-template-columns:150px 1fr 60px;align-items:center;gap:12px;margin-bottom:12px;font-size:13px;}
+  .shap-label{color:var(--text-soft);}
+  .shap-track{height:12px;background:#F0ECE4;border-radius:8px;overflow:hidden;position:relative;}
+  .shap-fill{height:100%;width:0;border-radius:8px;transition:width 1s var(--ease);}
+  .shap-fill.bad{background:linear-gradient(90deg,var(--accent-peach),var(--accent-peach-deep));}
+  .shap-fill.good{background:linear-gradient(90deg,var(--success-mint),#7fc9a3);}
+  .shap-val{font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:right;}
+
+  .interp-box{
+    background:rgba(255,232,163,0.4);border:1px solid rgba(255,232,163,0.9);border-radius:var(--radius-md);
+    padding:20px 22px;margin:28px 0;display:flex;gap:14px;font-size:14.5px;color:#7a6a2e;
+    opacity:0;transform:translateY(10px);transition:opacity .5s var(--ease) .3s,transform .5s var(--ease) .3s;
+  }
+  .interp-box.show{opacity:1;transform:translateY(0);}
+  .interp-box .iicon{font-size:22px;}
+
+  .action-buttons{display:flex;gap:10px;flex-wrap:wrap;}
+  .action-buttons button{
+    padding:11px 18px;font-size:14px;border-radius:100px;border:1.5px solid var(--border-soft);
+    background:var(--white);color:var(--text-dark);cursor:pointer;transition:all .25s var(--ease);font-family:'Inter',sans-serif;font-weight:500;
+  }
+  .action-buttons button:hover{border-color:var(--primary-soft);transform:translateY(-2px);box-shadow:var(--shadow-soft);}
+  .demo-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--text-lighter);gap:14px;padding-top:80px;}
+  .demo-placeholder .picon{font-size:48px;}
+
+  /* ===== FEATURES ===== */
+  .features{background:linear-gradient(160deg,var(--lavender) 0%, #F3ECFB 60%, var(--cream) 100%);}
+  .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+  .feature-card{
+    background:var(--white);border-radius:var(--radius-lg);padding:34px 28px;
+    box-shadow:var(--shadow-soft);transition:transform .35s var(--ease),box-shadow .35s var(--ease);
+    position:relative;overflow:hidden;
+  }
+  .feature-card:hover{transform:translateY(-8px);box-shadow:0 20px 45px rgba(224,212,247,0.55);}
+  .feature-card .ficon{font-size:38px;margin-bottom:16px;}
+  .feature-card h3{font-size:19px;margin-bottom:10px;}
+  .feature-card p{font-size:14.5px;color:var(--text-soft);margin-bottom:18px;}
+  .tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;padding:5px 11px;border-radius:100px;font-weight:600;}
+  .tag.peach{background:#FFE7E2;color:#B5544A;}
+  .tag.mint{background:#DDF4E7;color:#2E7A54;}
+  .tag.butter{background:#FFF3D2;color:#8A6D1E;}
+  .tag.lavender{background:#EDE4FA;color:#6B4FA0;}
+
+  /* ===== CAROUSEL ===== */
+  .carousel-wrap{position:relative;max-width:760px;margin:0 auto;}
+  .carousel-track{overflow:hidden;border-radius:var(--radius-lg);}
+  .carousel-slides{display:flex;transition:transform .55s var(--ease);}
+  .slide{min-width:100%;padding:44px;background:var(--white);border:1px solid var(--border-soft);border-radius:var(--radius-lg);box-shadow:var(--shadow-soft);}
+  .slide h4{font-size:20px;margin-bottom:20px;}
+  .up-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:14px;margin-bottom:18px;}
+  .up-table td{padding:10px 6px;border-bottom:1px solid var(--border-soft);}
+  .up-table tr.best td{background:rgba(180,231,206,0.35);border-radius:8px;font-weight:600;}
+  .mini-bars{display:flex;align-items:flex-end;gap:14px;height:80px;margin-top:12px;}
+  .mini-bars .b{flex:1;border-radius:6px 6px 0 0;background:var(--primary-soft);opacity:.75;}
+  .mini-bars .b.best{background:linear-gradient(180deg,#7fc9a3,var(--success-mint));opacity:1;}
+  .timeline-row{display:flex;justify-content:space-between;align-items:center;margin-top:24px;}
+  .tnode{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  .tnode .yr{color:var(--text-lighter);margin-bottom:6px;}
+  .tnode .wt{font-weight:700;color:var(--text-dark);font-size:16px;}
+  .tnode .pr{color:var(--primary-soft);}
+  .tarrow{color:var(--accent-peach-deep);font-size:14px;}
+  .lookup-card{display:flex;gap:20px;align-items:center;}
+  .lookup-thumb{width:88px;height:88px;border-radius:16px;background:linear-gradient(135deg,var(--warning-butter),var(--accent-peach));display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;}
+  .carousel-nav{display:flex;justify-content:center;align-items:center;gap:20px;margin-top:26px;}
+  .carousel-nav button{
+    width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border-soft);background:var(--white);
+    cursor:pointer;font-size:16px;color:var(--text-dark);transition:all .25s var(--ease);
+  }
+  .carousel-nav button:hover{border-color:var(--primary-soft);transform:scale(1.1);}
+  .dots{display:flex;gap:8px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--border-soft);cursor:pointer;transition:all .3s var(--ease);}
+  .dot.active{background:var(--accent-peach-deep);width:22px;border-radius:6px;}
+
+  /* ===== HOW IT WORKS ===== */
+  .how{background:linear-gradient(180deg,var(--cream),var(--white));}
+  .steps-flow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:relative;}
+  .step{flex:1;text-align:center;position:relative;}
+  .step-circle{
+    width:76px;height:76px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
+    font-size:30px;background:var(--gradient-hero);box-shadow:var(--shadow-soft);
+  }
+  .step h4{font-size:17px;margin-bottom:8px;}
+  .step p{font-size:14px;color:var(--text-lighter);padding:0 8px;}
+  .step-connector{
+    position:absolute;top:38px;left:calc(50% + 50px);width:calc(100% - 100px);height:2px;
+    background-image:repeating-linear-gradient(90deg,var(--border-soft) 0 8px,transparent 8px 16px);
+  }
+  .step:last-child .step-connector{display:none;}
+
+  /* ===== TRUST ===== */
+  .trust{background:var(--success-mint);}
+  .trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;text-align:center;}
+  .trust-col{padding:20px;}
+  .trust-col .ticon{font-size:38px;margin-bottom:14px;}
+  .trust-col h4{font-size:18px;margin-bottom:8px;color:#2e5240;}
+  .trust-col p{font-size:14px;color:#3f6b57;}
+
+  /* ===== CTA ===== */
+  .cta{background:var(--gradient-hero);text-align:center;position:relative;overflow:hidden;}
+  .cta h2{font-size:46px;margin-bottom:14px;}
+  .cta p.sub{font-size:19px;color:var(--text-soft);margin-bottom:38px;}
+  .cta .btn-primary{
+    padding:20px 44px;font-size:18px;
+    animation:pulseglow 2.6s ease-in-out infinite;
+  }
+  @keyframes pulseglow{
+    0%,100%{box-shadow:0 8px 24px rgba(255,154,139,0.4);}
+    50%{box-shadow:0 8px 44px rgba(255,154,139,0.75);}
+  }
+  .cta .micro{margin-top:18px;font-size:13.5px;color:var(--text-lighter);}
+
+  /* ===== FOOTER ===== */
+  footer{background:var(--cream);padding:60px 0 32px;border-top:1px solid var(--border-soft);}
+  .footer-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;margin-bottom:36px;}
+  .footer-links{display:flex;gap:28px;flex-wrap:wrap;}
+  .footer-links a{font-size:14.5px;color:var(--text-soft);}
+  .footer-links a:hover{color:var(--primary-soft);}
+  .footer-bottom{text-align:center;font-size:13px;color:var(--text-lighter);border-top:1px solid var(--border-soft);padding-top:24px;}
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width:1024px){
+    .demo-box{grid-template-columns:1fr;}
+    .features-grid{grid-template-columns:repeat(2,1fr);}
+    .trust-grid{grid-template-columns:1fr;gap:20px;}
+  }
+  @media (max-width:768px){
+    section{padding:70px 0;}
+    .nav-links{position:fixed;top:0;right:0;height:100vh;width:72%;background:rgba(255,251,245,0.98);
+      flex-direction:column;justify-content:center;align-items:flex-start;padding:40px;gap:26px;
+      transform:translateX(100%);transition:transform .4s var(--ease);backdrop-filter:blur(10px);}
+    .nav-links.open{transform:translateX(0);}
+    .burger{display:flex;}
+    .stats-grid{grid-template-columns:repeat(2,1fr);gap:36px 20px;}
+    .problem-grid{grid-template-columns:1fr;}
+    .features-grid{grid-template-columns:1fr;}
+    .steps-flow{flex-direction:column;gap:36px;}
+    .step-connector{display:none;}
+    .hero-search{flex-direction:column;border-radius:24px;padding:16px;}
+    .hero-search button{width:100%;justify-content:center;}
+    .demo-form,.demo-results{padding:32px 24px;}
+    .shap-row{grid-template-columns:100px 1fr 50px;font-size:12px;}
+    .cta h2{font-size:32px;}
+    .section-title{font-size:32px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+
+<nav id="mainNav">
+  <a href="#hero" class="logo">PRICE<span>TRUTH</span></a>
+  <div class="nav-links" id="navLinks">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#how" class="nav-link">How It Works</a>
+    <a href="#demo" class="nav-link">Demo</a>
+    <a href="#trust" class="nav-link">About</a>
+    <a href="dashboard.html" class="btn btn-primary">Try Now</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <div class="reveal" id="heroLogo"><span class="eyebrow">✨ ML-Powered Discount Verification</span></div>
+    <h1 class="reveal reveal-delay-1" id="heroHead">Is your discount<br>actually <span class="gradient-text">REAL?</span></h1>
+    <p class="sub reveal reveal-delay-2" id="heroSub">India's first ML-powered platform that verifies e-commerce discounts and tracks shrinkflation. Get instant, explainable results you can trust.</p>
+
+    <div class="hero-search reveal reveal-delay-3" id="heroSearch">
+      <input type="text" placeholder="Enter product name, URL, or scan barcode...">
+      <button class="btn btn-primary" onclick="document.getElementById('demo').scrollIntoView()">Verify Now ✨</button>
+    </div>
+
+    <div class="trust-badges reveal reveal-delay-4" id="heroBadges">
+      <span>✨ ML-Powered</span>
+      <span>📊 Explainable AI</span>
+      <span>🔍 Live Data</span>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll to explore</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats" id="stats">
+  <div class="container stats-grid">
+    <div class="reveal">
+      <div class="stat-num" data-count="7.8" data-suffix="L Cr" data-prefix="₹">₹0L Cr</div>
+      <div class="stat-label">E-commerce Market</div>
+    </div>
+    <div class="reveal reveal-delay-1">
+      <div class="stat-num" data-count="70" data-suffix="%">0%</div>
+      <div class="stat-label">Prioritize Discounts</div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="stat-num" data-count="96" data-suffix="%">0%</div>
+      <div class="stat-label">Accuracy</div>
+    </div>
+    <div class="reveal reveal-delay-3">
+      <div class="stat-num" data-count="1" data-suffix="M+">0M+</div>
+      <div class="stat-label">Products Analyzed</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <h2 class="section-title reveal">Why Price Truth?</h2>
+    <p class="section-sub reveal">Two silent tricks are draining your wallet — one loud, one quiet.</p>
+    <div class="problem-grid">
+      <div class="problem-card pink reveal">
+        <div class="icon">🎭</div>
+        <h3>Fake Discounts Everywhere</h3>
+        <p>E-commerce platforms love a big red badge. But the "original" price is often invented.</p>
+        <div class="price-demo">
+          <span class="strike">₹5,000</span> → <span class="final">₹2,500</span> <span style="color:var(--accent-peach-deep);font-weight:600;">(50% OFF!)</span>
+        </div>
+        <p style="font-size:14px;">Reality? This product never sold at ₹5,000. Actual market price: ₹2,600. Real discount: only ₹100 <span class="mono">(4%)</span> — not ₹2,500.</p>
+      </div>
+      <div class="problem-card blue reveal reveal-delay-2">
+        <div class="icon">📉</div>
+        <h3>Silent Shrinkflation</h3>
+        <p>Your favorite snacks are quietly shrinking while the price tag stays put.</p>
+        <div class="shrink-timeline-mini">
+          <div class="bar-wrap"><div class="bar" style="height:60px;"></div>125g</div>
+          <div class="bar-wrap"><div class="bar" style="height:48px;"></div>100g</div>
+          <div class="bar-wrap"><div class="bar" style="height:36px;"></div>82g</div>
+        </div>
+        <p style="font-size:14px;margin-top:16px;">Parle-G: 125g → 100g. Lay's Classic: 100g → 85g. Maggi: 4-pack → 3-pack. Same ₹20. You're getting less, paying the same — and probably never noticed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="container">
+    <h2 class="section-title reveal gradient-text">See It In Action</h2>
+    <p class="section-sub reveal">Try the discount checker with a real example below.</p>
+
+    <div class="demo-box reveal">
+      <div class="demo-form">
+        <div class="field">
+          <label>Product Category</label>
+          <select id="categorySelect">
+            <option>🎧 Wireless Headphones</option>
+            <option>👟 Running Shoes</option>
+            <option>📱 Smartphone Case</option>
+            <option>🍫 Packaged Snacks</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Listed Price (MRP)</label>
+          <div class="input-wrap">
+            <span class="rupee">₹</span>
+            <input type="number" id="mrpInput" value="5000">
+          </div>
+        </div>
+        <div class="field">
+          <label>Discounted Price</label>
+          <div class="input-wrap">
+            <span class="rupee">₹</span>
+            <input type="number" id="discInput" value="2500">
+          </div>
+        </div>
+        <button class="btn btn-primary" id="verifyBtn">Verify Discount ✨</button>
+      </div>
+
+      <div class="demo-results" id="demoResults">
+        <div class="demo-placeholder" id="demoPlaceholder">
+          <div class="picon">🔍</div>
+          <p>Enter a price and click "Verify Discount" to see the AI's explainable verdict.</p>
+        </div>
+
+        <div id="demoOutput" style="display:none;">
+          <div class="verdict-banner" id="verdictBanner">
+            <div class="vicon">⚠️</div>
+            <div>
+              <h4>Likely Inflated Discount</h4>
+              <p>This deal looks suspicious...</p>
+            </div>
+            <div class="confidence-badge">96% Confidence</div>
+          </div>
+
+          <div class="shap-title">Why? (AI Explanation)</div>
+          <div class="shap-row">
+            <div class="shap-label">Price gap vs avg</div>
+            <div class="shap-track"><div class="shap-fill bad" data-width="86" style="width:0;"></div></div>
+            <div class="shap-val" style="color:var(--accent-peach-deep);">+0.31</div>
+          </div>
+          <div class="shap-row">
+            <div class="shap-label">Discount vs norm</div>
+            <div class="shap-track"><div class="shap-fill bad" data-width="76" style="width:0;"></div></div>
+            <div class="shap-val" style="color:var(--accent-peach-deep);">+0.28</div>
+          </div>
+          <div class="shap-row">
+            <div class="shap-label">Low review count</div>
+            <div class="shap-track"><div class="shap-fill bad" data-width="26" style="width:0;"></div></div>
+            <div class="shap-val" style="color:var(--accent-peach-deep);">+0.09</div>
+          </div>
+          <div class="shap-row">
+            <div class="shap-label">Price volatility</div>
+            <div class="shap-track"><div class="shap-fill bad" data-width="17" style="width:0;"></div></div>
+            <div class="shap-val" style="color:var(--accent-peach-deep);">+0.06</div>
+          </div>
+          <div class="shap-row">
+            <div class="shap-label">Seller rating</div>
+            <div class="shap-track"><div class="shap-fill good" data-width="11" style="width:0;"></div></div>
+            <div class="shap-val" style="color:#2E7A54;">−0.04</div>
+          </div>
+
+          <div class="interp-box" id="interpBox">
+            <div class="iicon">💡</div>
+            <p id="interpText">The "original" price (₹5,000) is way higher than this category's average (₹2,620). The real discount is only ₹120, not ₹2,500!</p>
+          </div>
+
+          <div class="action-buttons">
+            <button>View on Amazon ↗</button>
+            <button>View on Flipkart ↗</button>
+            <button>Set Alert 🔔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+    <h2 class="section-title reveal">Five Ways We Help You Shop Smarter</h2>
+    <p class="section-sub reveal">Every feature is built to make discounts transparent, not mysterious.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="ficon">🎯</div>
+        <h3>True Discount Checker</h3>
+        <p>ML verification with explainable SHAP analysis. Know exactly WHY a discount is real or fake.</p>
+        <span class="tag peach">CORE</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="ficon">🔍</div>
+        <h3>Live Pack Lookup</h3>
+        <p>Scan barcodes or search products. Get real-time data from the Open Food Facts API.</p>
+        <span class="tag mint">LIVE</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="ficon">⚖️</div>
+        <h3>Unit Price Compare</h3>
+        <p>Compare price-per-100g across pack sizes. Find the real best value instantly.</p>
+        <span class="tag butter">SMART</span>
+      </div>
+      <div class="feature-card reveal">
+        <div class="ficon">📊</div>
+        <h3>Buy Timing Signal</h3>
+        <p>AI predicts when categories see their biggest discounts. Wait for Diwali, or buy now?</p>
+        <span class="tag lavender">AI</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="ficon">📉</div>
+        <h3>Shrink Timeline</h3>
+        <p>Visualize how products shrank over the years at the same price. See shrinkflation exposed.</p>
+        <span class="tag mint">EXCLUSIVE</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="ficon">🔗</div>
+        <h3>Direct Buy Links</h3>
+        <p>Every verified product links to Amazon, Flipkart, Myntra, and Meesho. Shop confidently.</p>
+        <span class="tag peach">EASY</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MINI DEMOS CAROUSEL -->
+<section id="carousel">
+  <div class="container">
+    <h2 class="section-title reveal">More Features in Action</h2>
+    <p class="section-sub reveal">A closer look at three tools inside Price Truth.</p>
+
+    <div class="carousel-wrap reveal">
+      <div class="carousel-track">
+        <div class="carousel-slides" id="carouselSlides">
+          <div class="slide">
+            <h4>⚖️ Unit Price Comparator</h4>
+            <table class="up-table">
+              <tr><td>500g @ ₹15</td><td>₹3.00/100g</td><td>❌</td></tr>
+              <tr><td>1kg @ ₹28</td><td>₹2.80/100g</td><td>❌</td></tr>
+              <tr class="best"><td>2kg @ ₹50</td><td>₹2.50/100g</td><td>✅ BEST VALUE</td></tr>
+            </table>
+            <div class="mini-bars">
+              <div class="b" style="height:90%;"></div>
+              <div class="b" style="height:75%;"></div>
+              <div class="b best" style="height:55%;"></div>
+            </div>
+          </div>
+          <div class="slide">
+            <h4>📉 Shrink Timeline</h4>
+            <div class="timeline-row">
+              <div class="tnode"><div class="yr">2015</div><div class="wt">150g</div><div class="pr">₹20</div></div>
+              <div class="tarrow">→ −17%</div>
+              <div class="tnode"><div class="yr">2018</div><div class="wt">125g</div><div class="pr">₹20</div></div>
+              <div class="tarrow">→ −20%</div>
+              <div class="tnode"><div class="yr">2021</div><div class="wt">100g</div><div class="pr">₹20</div></div>
+              <div class="tarrow">→ −18%</div>
+              <div class="tnode"><div class="yr">2024</div><div class="wt">82g</div><div class="pr">₹20</div></div>
+            </div>
+          </div>
+          <div class="slide">
+            <h4>🔍 Live Lookup</h4>
+            <div class="lookup-card">
+              <div class="lookup-thumb">🍫</div>
+              <div>
+                <div style="font-weight:600;color:var(--text-dark);">Nutella Hazelnut Spread (750g)</div>
+                <div style="font-size:13px;color:var(--text-lighter);margin:4px 0;">Brand: Nutella</div>
+                <div class="mono" style="font-size:12px;color:var(--text-lighter);">Barcode: 8901063112513</div>
+                <button class="btn btn-ghost" style="margin-top:12px;">Check Discount →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-nav">
+        <button id="prevSlide">‹</button>
+        <div class="dots" id="carouselDots"></div>
+        <button id="nextSlide">›</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="container">
+    <h2 class="section-title reveal">Simple. Smart. Transparent.</h2>
+    <p class="section-sub reveal">From input to decision in four honest steps.</p>
+    <div class="steps-flow">
+      <div class="step reveal">
+        <div class="step-connector"></div>
+        <div class="step-circle">📝</div>
+        <h4>Input</h4>
+        <p>Enter product details or scan a barcode</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-connector"></div>
+        <div class="step-circle">🧠</div>
+        <h4>AI Analysis</h4>
+        <p>ML models verify against historical data</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-connector"></div>
+        <div class="step-circle">📊</div>
+        <h4>SHAP Explains</h4>
+        <p>AI shows exactly why, in plain language</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-circle">✅</div>
+        <h4>Decide</h4>
+        <p>Shop confidently, or wait for a better deal</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="trust" id="trust">
+  <div class="container trust-grid">
+    <div class="trust-col reveal">
+      <div class="ticon">🎓</div>
+      <h4>Academic Project</h4>
+      <p>Built by M.Sc. Data Science students at NMIMS</p>
+    </div>
+    <div class="trust-col reveal reveal-delay-1">
+      <div class="ticon">🔬</div>
+      <h4>Real Data</h4>
+      <p>1M+ products from Kaggle + live APIs</p>
+    </div>
+    <div class="trust-col reveal reveal-delay-2">
+      <div class="ticon">🔒</div>
+      <h4>Transparent</h4>
+      <p>SHAP explainability — no black boxes</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="cta">
+  <div class="container">
+    <h2 class="reveal">Ready to Shop Smarter?</h2>
+    <p class="sub reveal reveal-delay-1">Join thousands making informed decisions.</p>
+    <a href="dashboard.html" class="btn btn-primary reveal reveal-delay-2">Try Dashboard →</a>
+    <p class="micro reveal reveal-delay-3">No signup needed • Free forever</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <a href="#hero" class="logo">PRICE<span>TRUTH</span></a>
+      <div class="footer-links">
+        <a href="#trust">About</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Price Truth. Built with ❤️ by Swagata, Charvi &amp; Yashwi | NMIMS</p>
+      <p style="margin-top:6px;">Academic Project — M.Sc. Data Science</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ---- Scroll progress bar ----
+  const progressBar = document.getElementById('scroll-progress');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressBar.style.width = scrolled + '%';
+
+    if(window.scrollY > 40){ nav.classList.add('scrolled'); } else { nav.classList.remove('scrolled'); }
+  });
+
+  // ---- Nav ----
+  const nav = document.getElementById('mainNav');
+  const burger = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => navLinks.classList.toggle('open'));
+  document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // ---- Reveal on scroll ----
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.15});
+  revealEls.forEach(el => io.observe(el));
+
+  // ---- Number counters ----
+  const statEls = document.querySelectorAll('.stat-num');
+  const counted = new WeakSet();
+  const statIo = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting && !counted.has(entry.target)){
+        counted.add(entry.target);
+        const el = entry.target;
+        const target = parseFloat(el.dataset.count);
+        const suffix = el.dataset.suffix || '';
+        const prefix = el.dataset.prefix || '';
+        const isDecimal = el.dataset.count.includes('.');
+        let current = 0;
+        const duration = 1400;
+        const start = performance.now();
+        function tick(now){
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          current = target * eased;
+          el.textContent = prefix + (isDecimal ? current.toFixed(1) : Math.round(current)) + suffix;
+          if(progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+    });
+  }, {threshold:0.4});
+  statEls.forEach(el => statIo.observe(el));
+
+  // ---- Discount verify demo ----
+  const verifyBtn = document.getElementById('verifyBtn');
+  const demoPlaceholder = document.getElementById('demoPlaceholder');
+  const demoOutput = document.getElementById('demoOutput');
+  const verdictBanner = document.getElementById('verdictBanner');
+  const interpBox = document.getElementById('interpBox');
+  const interpText = document.getElementById('interpText');
+  const mrpInput = document.getElementById('mrpInput');
+  const discInput = document.getElementById('discInput');
+
+  verifyBtn.addEventListener('click', () => {
+    const mrp = parseFloat(mrpInput.value) || 0;
+    const disc = parseFloat(discInput.value) || 0;
+    const marketAvg = Math.round(disc * 1.048); // simulated fair market price
+    const realSavings = Math.max(mrp - marketAvg, marketAvg - disc, 0);
+    const realDiscountAmt = Math.max(marketAvg - disc, 0) || Math.round((mrp - disc) * 0.048);
+
+    demoPlaceholder.style.display = 'none';
+    demoOutput.style.display = 'block';
+
+    // reset animation state
+    verdictBanner.classList.remove('show');
+    interpBox.classList.remove('show');
+    document.querySelectorAll('.shap-fill').forEach(f => f.style.width = '0');
+
+    requestAnimationFrame(() => {
+      setTimeout(() => verdictBanner.classList.add('show'), 50);
+      setTimeout(() => {
+        document.querySelectorAll('.shap-fill').forEach(f => {
+          f.style.width = f.dataset.width + '%';
+        });
+      }, 250);
+      setTimeout(() => {
+        interpBox.classList.add('show');
+        interpText.textContent = `The "original" price (₹${mrp.toLocaleString('en-IN')}) is way higher than this category's average (₹${marketAvg.toLocaleString('en-IN')}). The real discount is only ₹${realDiscountAmt.toLocaleString('en-IN')}, not ₹${(mrp-disc).toLocaleString('en-IN')}!`;
+      }, 700);
+    });
+  });
+
+  // ---- Carousel ----
+  const slidesTrack = document.getElementById('carouselSlides');
+  const slides = slidesTrack.children;
+  const dotsWrap = document.getElementById('carouselDots');
+  let current = 0;
+  for(let i=0;i<slides.length;i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0 ? ' active':'');
+    d.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(d);
+  }
+  function goTo(i){
+    current = (i + slides.length) % slides.length;
+    slidesTrack.style.transform = `translateX(-${current * 100}%)`;
+    [...dotsWrap.children].forEach((d,idx) => d.classList.toggle('active', idx===current));
+  }
+  document.getElementById('prevSlide').addEventListener('click', () => goTo(current-1));
+  document.getElementById('nextSlide').addEventListener('click', () => goTo(current+1));
+
+  // touch swipe
+  let touchStartX = 0;
+  slidesTrack.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+  slidesTrack.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if(dx > 50) goTo(current-1);
+    else if(dx < -50) goTo(current+1);
+  });
+
+  // ---- Smooth scroll for nav links (native scroll-behavior handles most; ensures offset) ----
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e){
+      const targetId = this.getAttribute('href');
+      const target = document.querySelector(targetId);
+      if(target){
+        e.preventDefault();
+        const y = target.getBoundingClientRect().top + window.scrollY - 90;
+        window.scrollTo({top:y, behavior:'smooth'});
+      }
+    });
+  });
+</script>
+</body>
+</html>
