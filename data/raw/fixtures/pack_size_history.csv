@@ -1,0 +1,12 @@
+product_id,product_name,observed_at,pack_quantity,pack_unit,selling_price,source_type,source_citation
+amz_0001,Parle-G Original Glucose Biscuits,2019-03-01,100,g,10,cited_public_record,"Consumer press coverage of Parle-G Rs.10 pack grammage, 2019 (synthetic fixture)"
+amz_0001,Parle-G Original Glucose Biscuits,2021-06-01,92,g,10,cited_public_record,"Retail shelf audit archive, 2021 (synthetic fixture)"
+amz_0001,Parle-G Original Glucose Biscuits,2023-05-01,83,g,10,cited_public_record,"Shrinkflation tracker community dataset, 2023 (synthetic fixture)"
+amz_0001,Parle-G Original Glucose Biscuits,2025-02-01,75,g,10,off,"Open Food Facts product quantity field, 2025 (synthetic fixture)"
+amz_0006,Dove Intense Repair Daily Shampoo,2020-01-01,400,ml,299,cited_public_record,"Archived e-commerce listing snapshot, 2020 (synthetic fixture)"
+amz_0006,Dove Intense Repair Daily Shampoo,2022-07-01,380,ml,299,cited_public_record,"Consumer forum price/size log, 2022 (synthetic fixture)"
+amz_0006,Dove Intense Repair Daily Shampoo,2024-08-01,340,ml,299,off,"Open Food Facts product quantity field, 2024 (synthetic fixture)"
+amz_0007,Colgate MaxFresh Red Gel Toothpaste,2021-01-01,150,g,99,cited_public_record,"Packaging archive comparison, 2021 (synthetic fixture)"
+amz_0007,Colgate MaxFresh Red Gel Toothpaste,2023-03-01,140,g,99,cited_public_record,"Retail audit newsletter, 2023 (synthetic fixture)"
+amz_0007,Colgate MaxFresh Red Gel Toothpaste,2025-01-01,132,g,99,off,"Open Food Facts product quantity field, 2025 (synthetic fixture)"
+amz_0002,Fortune Sunlite Refined Sunflower Oil,2024-01-01,1000,ml,155,off,"Open Food Facts product quantity field, 2024 (synthetic fixture)"

@@ -1,0 +1,79 @@
+product_id,product_name,category,discounted_price,actual_price,discount_percentage,rating,rating_count
+amz_0003,boAt Rockerz 255 Pro+ Bluetooth Neckband,Electronics|Audio|Headphones,"₹1,299","₹1,999",35%,4.10,"32,210"
+amz_0101,boAt True Wireless Earbuds D22G,Electronics|Audio|Headphones,"₹1,740","₹6,930",75%,3.70,331
+amz_0102,Realme Gaming Headset N93X,Electronics|Audio|Headphones,"₹1,590","₹4,680",66%,3.80,"31,692"
+amz_0103,boAt Gaming Headset H13X,Electronics|Audio|Headphones,1340,1600,16,3.60,32732
+amz_0104,Noise Bluetooth Earbuds N70U,Electronics|Audio|Headphones,1210,1530,21,4,28509
+amz_0105,pTron Over-Ear Headphones N25S,Electronics|Audio|Headphones,"₹1,450","₹5,610",74%,4,"37,577"
+amz_0106,JBL Wireless Headphones P23X,Electronics|Audio|Headphones,1050,1250,16,4.20,12657
+amz_0107,JBL True Wireless Earbuds N91L,Electronics|Audio|Headphones,1090,1420,23,3.90,36269
+amz_0108,boAt Neckband Earphones D78X,Electronics|Audio|Headphones,1340,1560,14,3.70,22696
+amz_0109,Noise Gaming Headset P41L,Electronics|Audio|Headphones,1230,1600,23,4.20,3510
+amz_0110,Realme Gaming Headset E20G,Electronics|Audio|Headphones,1830,7250,75,3.80,38718
+amz_0111,Realme Wireless Headphones H57U,Electronics|Audio|Headphones,1640,6420,74,3.70,8133
+amz_0112,pTron Gaming Headset T51G,Electronics|Audio|Headphones,1030,1300,21,4.20,39592
+amz_0004,Samsung 43 inch Crystal 4K UHD Smart TV,Electronics|Televisions|SmartTVs,32999,47900,31,4.30,11200
+amz_0113,OnePlus 50 inch 4K UHD Smart TV D22G,Electronics|Televisions|SmartTVs,24110,30970,22,4.20,11150
+amz_0114,Sony 32 inch HD Ready LED TV M93U,Electronics|Televisions|SmartTVs,26090,30490,14,4,683
+amz_0115,OnePlus 40 inch Android TV B46G,Electronics|Televisions|SmartTVs,23070,31000,26,4.20,7832
+amz_0116,LG 50 inch 4K UHD Smart TV A66S,Electronics|Televisions|SmartTVs,33480,150580,78,4.20,7565
+amz_0117,Acer 50 inch 4K UHD Smart TV R51L,Electronics|Televisions|SmartTVs,22630,31250,28,4.40,3901
+amz_0118,TCL 40 inch Android TV Z51U,Electronics|Televisions|SmartTVs,35470,168780,79,4.20,8984
+amz_0119,Samsung 43 inch Full HD Smart TV E82U,Electronics|Televisions|SmartTVs,28290,40410,30,4.30,5104
+amz_0120,Acer 40 inch Android TV B75U,Electronics|Televisions|SmartTVs,31100,38040,18,4.10,2424
+amz_0121,TCL 43 inch Full HD Smart TV N69L,Electronics|Televisions|SmartTVs,29900,44580,33,4.10,9068
+amz_0122,Acer 55 inch QLED Smart TV A73X,Electronics|Televisions|SmartTVs,32760,102820,68,4.30,11680
+amz_0123,TCL 40 inch Android TV Z85U,Electronics|Televisions|SmartTVs,"₹27,610","₹36,500",24%,4,"9,314"
+amz_0124,Mi 55 inch QLED Smart TV P64L,Electronics|Televisions|SmartTVs,24090,33900,29,4.50,5977
+amz_0001,Parle-G Original Glucose Biscuits,Grocery&GourmetFoods|Biscuits,10,12,17,4.40,84210
+amz_0125,McVitie's Choco Chip Cookies N97U,Grocery&GourmetFoods|Biscuits,31.40,39.40,20,4.50,60907
+amz_0126,Britannia Cream Biscuits R47G,Grocery&GourmetFoods|Biscuits,43.50,179.30,76,4.10,15891
+amz_0127,Sunfeast Glucose Biscuits E36S,Grocery&GourmetFoods|Biscuits,25.30,34,26,4.80,31052
+amz_0128,Unibic Marie Light Biscuits E36X,Grocery&GourmetFoods|Biscuits,42.60,168,75,4.30,92366
+amz_0129,Sunfeast Glucose Biscuits P31X,Grocery&GourmetFoods|Biscuits,43.90,202.70,78,4.50,8265
+amz_0130,Sunfeast Glucose Biscuits D98X,Grocery&GourmetFoods|Biscuits,30.80,36.60,16,4.40,55017
+amz_0131,McVitie's Cream Biscuits S40L,Grocery&GourmetFoods|Biscuits,34.80,49,29,4.10,45650
+amz_0132,Unibic Bourbon Biscuit Pack H96S,Grocery&GourmetFoods|Biscuits,43.80,193.10,77,4.10,41704
+amz_0133,Sunfeast Digestive Biscuits B61L,Grocery&GourmetFoods|Biscuits,31.10,40.70,24,4.40,60176
+amz_0134,Parle Marie Light Biscuits H60X,Grocery&GourmetFoods|Biscuits,27.30,36.50,25,4.30,15299
+amz_0135,Cadbury Bourbon Biscuit Pack B88X,Grocery&GourmetFoods|Biscuits,43.70,204.30,79,4.30,82790
+amz_0136,Unibic Bourbon Biscuit Pack D98U,Grocery&GourmetFoods|Biscuits,45.30,196.90,77,4.20,69611
+amz_0002,Fortune Sunlite Refined Sunflower Oil,Grocery&GourmetFoods|EdibleOil,155,199,22,4.30,38940
+amz_0137,Gemini Rice Bran Oil 1L M69X,Grocery&GourmetFoods|EdibleOil,109,127,14,3.90,18132
+amz_0138,Fortune Refined Sunflower Oil 1L S43L,Grocery&GourmetFoods|EdibleOil,158,606,74,3.80,22036
+amz_0139,Saffola Rice Bran Oil 1L P28X,Grocery&GourmetFoods|EdibleOil,123,179,31,4.60,11056
+amz_0140,Gemini Refined Sunflower Oil 1L T13S,Grocery&GourmetFoods|EdibleOil,200,660,70,3.90,31551
+amz_0141,Gemini Kachi Ghani Mustard Oil 1L S21G,Grocery&GourmetFoods|EdibleOil,119,151,21,4.40,40309
+amz_0142,Dhara Rice Bran Oil 1L M88S,Grocery&GourmetFoods|EdibleOil,110,149,26,4.50,32438
+amz_0143,Dhara Kachi Ghani Mustard Oil 1L N93S,Grocery&GourmetFoods|EdibleOil,112,139,19,4.50,15147
+amz_0144,Figaro Kachi Ghani Mustard Oil 1L A66X,Grocery&GourmetFoods|EdibleOil,161,674,76,4.10,31089
+amz_0145,Figaro Soybean Oil 1L Z79S,Grocery&GourmetFoods|EdibleOil,132,158,16,4.50,14303
+amz_0146,Sundrop Soybean Oil 1L M68U,Grocery&GourmetFoods|EdibleOil,173,771,78,4.50,35258
+amz_0147,Fortune Groundnut Oil 1L A48L,Grocery&GourmetFoods|EdibleOil,173,792,78,4.30,9023
+amz_0148,Figaro Groundnut Oil 1L E78U,Grocery&GourmetFoods|EdibleOil,₹109,₹130,16%,4.30,"34,573"
+amz_0005,Prestige Deluxe Alpha Stainless Steel Pressure Cooker,Home&Kitchen|Kitchen,1199,1650,27,4.40,20130
+amz_0149,Milton 3L Pressure Cooker H43U,Home&Kitchen|Kitchen,866,3828,77,4.40,5786
+amz_0150,Milton 1L Vacuum Flask T92G,Home&Kitchen|Kitchen,694,994,30,4.10,19840
+amz_0151,Pigeon 1L Vacuum Flask N92U,Home&Kitchen|Kitchen,892,2609,66,3.80,20952
+amz_0152,Pigeon Vegetable Chopper 900ml Z21G,Home&Kitchen|Kitchen,618,826,25,4.10,22701
+amz_0153,Pigeon Hand Blender 300W E25S,Home&Kitchen|Kitchen,693,804,14,4.40,6818
+amz_0154,Cello Stainless Steel Casserole Set Z53X,Home&Kitchen|Kitchen,1023,3401,70,4,14870
+amz_0155,Prestige Stainless Steel Casserole Set T17U,Home&Kitchen|Kitchen,775,1154,33,4.50,16990
+amz_0156,Butterfly Vegetable Chopper 900ml H81U,Home&Kitchen|Kitchen,954,3979,76,4.40,15657
+amz_0157,Milton Hand Blender 300W S99S,Home&Kitchen|Kitchen,669,978,32,3.80,16788
+amz_0158,Butterfly Stainless Steel Casserole Set Z20X,Home&Kitchen|Kitchen,1029,3124,67,4.40,16695
+amz_0159,Cello 3L Pressure Cooker N73G,Home&Kitchen|Kitchen,704,980,28,4.30,7407
+amz_0160,Cello Non-Stick Kadai S13L,Home&Kitchen|Kitchen,836,2740,69,3.60,7494
+amz_0006,Dove Intense Repair Daily Shampoo,Beauty&PersonalCare|PersonalCare,299,399,25,4.40,51220
+amz_0007,Colgate MaxFresh Red Gel Toothpaste,Beauty&PersonalCare|PersonalCare,99,120,18,4.50,60110
+amz_0161,Mamaearth Moisturising Cream E69S,Beauty&PersonalCare|PersonalCare,202,919,78,4.60,43056
+amz_0162,Himalaya Gentle Face Wash B65U,Beauty&PersonalCare|PersonalCare,208,844,75,3.90,21514
+amz_0163,Dove Body Lotion N87S,Beauty&PersonalCare|PersonalCare,160,192,17,3.90,21626
+amz_0164,Mamaearth Sunscreen SPF 50 P54S,Beauty&PersonalCare|PersonalCare,138,165,16,4.10,599
+amz_0165,Himalaya Body Lotion B95L,Beauty&PersonalCare|PersonalCare,238,879,73,4.20,17435
+amz_0166,Mamaearth Gentle Face Wash B22X,Beauty&PersonalCare|PersonalCare,163,188,13,4.10,29452
+amz_0167,Nivea Body Lotion E37S,Beauty&PersonalCare|PersonalCare,141,177,20,4.20,41268
+amz_0168,Himalaya Moisturising Cream R30S,Beauty&PersonalCare|PersonalCare,184,231,20,4.60,18330
+amz_0169,Dove Moisturising Cream S29U,Beauty&PersonalCare|PersonalCare,231,970,76,4.70,29507
+amz_0170,Himalaya Moisturising Cream M45G,Beauty&PersonalCare|PersonalCare,220,757,71,4.40,5581
+amz_0171,Garnier Gentle Face Wash D10L,Beauty&PersonalCare|PersonalCare,135,176,23,3.90,31099

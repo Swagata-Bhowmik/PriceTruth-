@@ -1,0 +1,368 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add dependencies and implement the settings module": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109475833
+      },
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109525343
+      },
+      {
+        "executionId": "b0756c04-e22b-4443-b33f-1769399d01cc",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788114139241
+      }
+    ],
+    "1.2 Implement the structured error payload and central exception handlers": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109475945
+      }
+    ],
+    "1.4 Configure structured logging and implement DB session + Redis client": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476037
+      }
+    ],
+    "1.5 Implement the health endpoint": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476110
+      }
+    ],
+    "2.1 Implement SQLAlchemy 2.0 models for the six tables": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476191
+      }
+    ],
+    "2.2 Implement repository helpers and table creation": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476265
+      }
+    ],
+    "3.1 Create synthetic fixture datasets": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476341
+      },
+      {
+        "executionId": "b0756c04-e22b-4443-b33f-1769399d01cc",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788114253908
+      },
+      {
+        "executionId": "b45282ce-850e-48cc-b311-19976939dc75",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788116072696
+      }
+    ],
+    "3.2 Implement CSV load and cleaning into core tables": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476420
+      }
+    ],
+    "3.3 Compute and persist category price statistics": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476515
+      }
+    ],
+    "3.4 Compute and persist category seasonality": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476608
+      }
+    ],
+    "3.5 Finalize the Kaggle download script and full-data run": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476690
+      }
+    ],
+    "4.1 Implement snapshot-aware feature engineering": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476807
+      }
+    ],
+    "4.2 Implement the transparent weak-supervision labeling rule": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476884
+      }
+    ],
+    "4.3 Implement the XGBoost training script and model persistence": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109476971
+      }
+    ],
+    "4.4 Implement the load-once inference module": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477050
+      }
+    ],
+    "4.5 Implement the SHAP explainer with plain-language labels": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477169
+      }
+    ],
+    "5. Checkpoint - backend foundation": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477248
+      }
+    ],
+    "6.1 Implement the unit price comparator service": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477320
+      }
+    ],
+    "6.3 Implement the unit-price compare endpoint and schemas": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477398
+      }
+    ],
+    "7.1 Implement the OFF client with timeout and bounded retries": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477468
+      }
+    ],
+    "7.2 Implement the Redis caching layer for OFF and results": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477536
+      }
+    ],
+    "7.3 Implement external-value validation and missing-field handling": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477647
+      }
+    ],
+    "8.1 Implement the discount scoring and banding service": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477728
+      }
+    ],
+    "8.3 Implement the discount-check endpoint with the SHAP breakdown": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477803
+      }
+    ],
+    "9.1 Implement the shrinkflation service": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477880
+      }
+    ],
+    "9.3 Implement the shrinkflation endpoint": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109477953
+      }
+    ],
+    "10.1 Implement the cross-platform service": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478039
+      }
+    ],
+    "10.3 Implement the cross-platform endpoint": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478120
+      }
+    ],
+    "11.1 Implement the seasonality module and buy-timing service": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478236
+      }
+    ],
+    "11.3 Implement the buy-timing endpoint": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478308
+      }
+    ],
+    "12.1 Implement the search service and manual entry": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478381
+      }
+    ],
+    "12.3 Implement the search and manual-entry endpoints": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478458
+      }
+    ],
+    "13.1 Implement the composite dashboard endpoint with per-module containment": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478531
+      }
+    ],
+    "13.2 Implement the data-sources disclosure endpoint": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478615
+      }
+    ],
+    "14.1 Add request rate limiting": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478690
+      }
+    ],
+    "14.2 Tighten CORS and confirm boundary input validation": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478770
+      }
+    ],
+    "15. Checkpoint - backend complete": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478841
+      }
+    ],
+    "16.1 Set up Vite + React 18 + Tailwind and install dependencies": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109478919
+      }
+    ],
+    "16.2 Implement the API client and shared components": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479000
+      }
+    ],
+    "17.1 Implement DiscountCheckerCard with the SHAP waterfall": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479080
+      }
+    ],
+    "17.2 Implement ShrinkflationCard with the timeline chart": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479150
+      }
+    ],
+    "17.3 Implement UnitPriceCard with comparison bars": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479225
+      }
+    ],
+    "17.4 Implement BuyTimingCard with the seasonality view": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479302
+      }
+    ],
+    "17.5 Implement CrossPlatformCard with platform bars": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479372
+      }
+    ],
+    "18.1 Implement SearchPage": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479454
+      }
+    ],
+    "18.2 Implement DashboardPage with the compact responsive grid": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479533
+      }
+    ],
+    "20.1 Finalize container and environment configuration": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479615
+      }
+    ],
+    "20.2 Configure Vercel (frontend) and Railway (backend/DB/Redis) deploys": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479692
+      }
+    ],
+    "21. Final checkpoint - full stack": [
+      {
+        "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788109479769
+      }
+    ]
+  }
+}

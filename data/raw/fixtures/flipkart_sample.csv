@@ -1,0 +1,55 @@
+product_id,product_name,category_tree,retail_price,discounted_price,brand,overall_rating,rating_count
+fk_0001,JBL Tune 510BT Wireless On-Ear Headphones,"[""Electronics >> Audio >> Headphones""]",3999,2499,JBL,4.20,15420
+fk_0101,OnePlus Bluetooth Earbuds N51L,"[""Electronics >> Audio >> Headphones""]",2000,1450,OnePlus,4.20,36454
+fk_0102,Sony Gaming Headset D52S,"[""Electronics >> Audio >> Headphones""]",1290,1010,Sony,3.80,38281
+fk_0103,JBL Bluetooth Earbuds Z13S,"[""Electronics >> Audio >> Headphones""]",1800,1200,JBL,4.50,15962
+fk_0104,OnePlus Over-Ear Headphones E51X,"[""Electronics >> Audio >> Headphones""]",7140,1730,OnePlus,4.10,20279
+fk_0105,pTron Wireless Headphones E24L,"[""Electronics >> Audio >> Headphones""]",5820,1630,pTron,3.60,2788
+fk_0106,Noise Gaming Headset S95U,"[""Electronics >> Audio >> Headphones""]",1780,1390,Noise,4,17400
+fk_0107,Realme Gaming Headset H35G,"[""Electronics >> Audio >> Headphones""]",1250,1000,Realme,4.50,31604
+fk_0108,Realme Wireless Headphones H27G,"[""Electronics >> Audio >> Headphones""]",4940,1530,Realme,3.90,6100
+fk_0109,LG 32 inch HD Ready LED TV H38L,"[""Electronics >> Televisions >> Smart TVs""]",31970,22700,LG,4.40,6117
+fk_0110,Samsung 55 inch QLED Smart TV B44U,"[""Electronics >> Televisions >> Smart TVs""]",130790,35560,Samsung,3.90,3753
+fk_0111,Samsung 50 inch 4K UHD Smart TV P78G,"[""Electronics >> Televisions >> Smart TVs""]",36710,29130,Samsung,4.10,6691
+fk_0112,TCL 40 inch Android TV H77S,"[""Electronics >> Televisions >> Smart TVs""]",28390,24000,TCL,4.50,3186
+fk_0113,OnePlus 55 inch QLED Smart TV B78X,"[""Electronics >> Televisions >> Smart TVs""]",163710,38860,OnePlus,4.30,8087
+fk_0114,Samsung 43 inch Full HD Smart TV A48U,"[""Electronics >> Televisions >> Smart TVs""]",32980,22190,Samsung,4.10,9975
+fk_0115,Sony 50 inch 4K UHD Smart TV E95G,"[""Electronics >> Televisions >> Smart TVs""]",112750,31540,Sony,4,10737
+fk_0116,LG 40 inch Android TV N21U,"[""Electronics >> Televisions >> Smart TVs""]",115600,34050,LG,4.30,8747
+fk_0117,OnePlus 32 inch HD Ready LED TV H64L,"[""Electronics >> Televisions >> Smart TVs""]",126040,37420,OnePlus,4,374
+fk_0118,McVitie's Glucose Biscuits T17X,"[""Food & Beverages >> Snacks >> Biscuits""]",46.60,31.60,McVitie's,4.10,40347
+fk_0119,Cadbury Digestive Biscuits M46G,"[""Food & Beverages >> Snacks >> Biscuits""]",37.80,32,Cadbury,4.70,13743
+fk_0120,Unibic Digestive Biscuits D97G,"[""Food & Beverages >> Snacks >> Biscuits""]",36.10,25.50,Unibic,4.80,6574
+fk_0121,Parle Cream Biscuits T76X,"[""Food & Beverages >> Snacks >> Biscuits""]",194.50,45.80,Parle,4.30,37016
+fk_0122,Britannia Bourbon Biscuit Pack A59L,"[""Food & Beverages >> Snacks >> Biscuits""]",42.60,31.90,Britannia,4.40,43059
+fk_0123,Sunfeast Bourbon Biscuit Pack H25L,"[""Food & Beverages >> Snacks >> Biscuits""]",48.80,36.50,Sunfeast,4.50,94554
+fk_0124,Cadbury Glucose Biscuits P20L,"[""Food & Beverages >> Snacks >> Biscuits""]",47,34.80,Cadbury,4.50,46995
+fk_0125,Sunfeast Bourbon Biscuit Pack N56X,"[""Food & Beverages >> Snacks >> Biscuits""]",127.60,36.70,Sunfeast,4.60,66325
+fk_0126,Sunfeast Choco Chip Cookies S77U,"[""Food & Beverages >> Snacks >> Biscuits""]",37.30,28.40,Sunfeast,4.20,10537
+fk_0127,Sundrop Refined Sunflower Oil 1L H32U,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",713,177,Sundrop,4.20,35715
+fk_0128,Gemini Groundnut Oil 1L R23S,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",186,147,Gemini,4.30,30953
+fk_0129,Gemini Groundnut Oil 1L T90S,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",204,158,Gemini,4.30,3796
+fk_0130,Gemini Rice Bran Oil 1L P46U,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",201,151,Gemini,4.20,6401
+fk_0131,Dhara Refined Sunflower Oil 1L B34X,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",204,141,Dhara,3.90,26474
+fk_0132,Fortune Refined Sunflower Oil 1L M84U,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",185,136,Fortune,3.80,26020
+fk_0133,Sundrop Rice Bran Oil 1L R83X,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",485,170,Sundrop,4.50,19135
+fk_0134,Gemini Kachi Ghani Mustard Oil 1L S12U,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",664,168,Gemini,4.20,34203
+fk_0135,Gemini Refined Sunflower Oil 1L E57S,"[""Food & Beverages >> Cooking Essentials >> Edible Oil""]",188,130,Gemini,4.30,4503
+fk_0136,Prestige Non-Stick Kadai R43G,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",897,647,Prestige,4.30,16472
+fk_0137,Hawkins Hand Blender 300W P20G,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",2703,861,Hawkins,3.70,11496
+fk_0138,Milton 1L Vacuum Flask D35G,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",1032,780,Milton,3.90,8268
+fk_0139,Pigeon Stainless Steel Casserole Set Z75X,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",3402,966,Pigeon,4,4340
+fk_0140,Pigeon Stainless Steel Casserole Set A68X,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",1005,728,Pigeon,4.20,8506
+fk_0141,Butterfly 1L Vacuum Flask D70S,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",865,585,Butterfly,4.40,7694
+fk_0142,Butterfly 1L Vacuum Flask N86X,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",877,590,Butterfly,3.70,24258
+fk_0143,Hawkins Stainless Steel Casserole Set M29L,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",1126,791,Hawkins,4.40,14661
+fk_0144,Prestige Vegetable Chopper 900ml E15G,"[""Home & Kitchen >> Cookware >> Kitchen Tools""]",1076,816,Prestige,4,19391
+fk_0145,Himalaya Gentle Face Wash T12U,"[""Beauty & Personal Care >> Personal Care""]",879,213,Himalaya,3.90,35336
+fk_0146,Garnier Daily Shampoo D21X,"[""Beauty & Personal Care >> Personal Care""]",654,196,Garnier,4.20,16085
+fk_0147,Dove Daily Shampoo Z48L,"[""Beauty & Personal Care >> Personal Care""]",198,138,Dove,4.50,11610
+fk_0148,Mamaearth Body Lotion M28S,"[""Beauty & Personal Care >> Personal Care""]",210,147,Mamaearth,4,6758
+fk_0149,Mamaearth Sunscreen SPF 50 P24G,"[""Beauty & Personal Care >> Personal Care""]",600,194,Mamaearth,4.30,4387
+fk_0150,Garnier Sunscreen SPF 50 H93U,"[""Beauty & Personal Care >> Personal Care""]",245,191,Garnier,3.90,22040
+fk_0151,Himalaya Body Lotion M21G,"[""Beauty & Personal Care >> Personal Care""]",252,183,Himalaya,4,48987
+fk_0152,Nivea Moisturising Cream R46L,"[""Beauty & Personal Care >> Personal Care""]",173,140,Nivea,4.50,20186
+fk_0153,L'Oreal Gentle Face Wash D52G,"[""Beauty & Personal Care >> Personal Care""]",155,135,L'Oreal,4.30,29552

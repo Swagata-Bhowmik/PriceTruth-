@@ -16,7 +16,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
 ## Tasks
 
 - [ ] 1. Backend configuration and error-handling foundation
-  - [ ] 1.1 Add dependencies and implement the settings module
+  - [x] 1.1 Add dependencies and implement the settings module
     - Add `hypothesis`, `slowapi` (rate limiting), and confirm `pytest`, `pytest-cov`, `httpx` are present in `backend/requirements.txt`
     - Create `app/core/config.py` using `pydantic-settings` to read `DATABASE_URL`, `REDIS_URL`, `OFF_BASE_URL`, `OFF_VERSION`, and `CORS_ALLOWED_ORIGIN` from environment variables (no hardcoded endpoints or secrets)
     - _Requirements: 13.1, 13.4, 18.6_
@@ -58,7 +58,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 18.2_
 
 - [ ] 3. Offline data ingestion pipeline
-  - [ ] 3.1 Create synthetic fixture datasets
+  - [x] 3.1 Create synthetic fixture datasets
     - Add small synthetic CSVs under `data/raw/fixtures/` matching the Kaggle Amazon/Flipkart schema (price, reference price, discount, rating, rating count, category, pack quantity) plus a few curated `pack_size_history` rows, so the whole pipeline runs without the real download
     - _Requirements: 17.1_
 
