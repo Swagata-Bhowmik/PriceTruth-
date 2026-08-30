@@ -26,7 +26,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Register a central exception handler in `main.py` that converts validation errors, domain errors, and unhandled errors into the single payload shape; add a DB-unreachable path returning a 503 with a retry message
     - _Requirements: 15.3, 16.4_
 
-  - [ ]* 1.3 Write property test for the structured error payload
+  - [x]* 1.3 Write property test for the structured error payload
     - **Property 23: All error responses use the structured payload**
     - **Validates: Requirements 15.3**
 
@@ -118,7 +118,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - In `app/services/unit_price_service.py`, convert each variant's pack quantity to a common standard unit (g/ml; kg to g and l to ml multiply by 1000), compute unit price = price / standardized quantity, mark the lowest as best value, and exclude variants with missing/non-positive quantity into an `excluded` list with a reason
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ]* 6.2 Write property tests for the unit price comparator
+  - [x]* 6.2 Write property tests for the unit price comparator
     - **Property 12: Unit price identity per variant** - _Validates: Requirements 5.1_
     - **Property 13: Best value is the minimum unit price** - _Validates: Requirements 5.2_
     - **Property 14: Unit-price comparison is invariant to unit scale** - _Validates: Requirements 5.4_
