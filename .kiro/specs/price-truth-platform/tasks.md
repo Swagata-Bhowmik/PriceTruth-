@@ -44,7 +44,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 15.3, 16.1, 16.4_
 
 - [ ] 2. Database models and repositories
-  - [ ] 2.1 Implement SQLAlchemy 2.0 models for the six tables
+  - [x] 2.1 Implement SQLAlchemy 2.0 models for the six tables
     - In `app/db/models.py`, define `products`, `category_price_stats`, `price_snapshots`, `pack_size_history`, `platform_prices`, `category_seasonality` per the ER diagram, including the nullable `platform_prices.genuineness_score` and the attribution columns on `pack_size_history`
     - _Requirements: 17.5_
 
