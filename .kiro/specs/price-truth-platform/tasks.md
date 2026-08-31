@@ -146,7 +146,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Flag OFF-derived results as crowd-sourced/possibly incomplete
     - _Requirements: 9.1, 9.5, 10.3, 15.4, 18.1_
 
-  - [ ]* 7.4 Write property tests for the data service
+  - [x]* 7.4 Write property tests for the data service
     - **Property 20: Missing OFF fields degrade gracefully** - _Validates: Requirements 9.1_
     - **Property 21: Cache returns results identical to fresh computation** - _Validates: Requirements 9.4, 12.3_
     - **Property 22: External and input values are validated before use** - _Validates: Requirements 9.5, 15.4, 18.1_
@@ -192,11 +192,11 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 10: Unit price identity at each timeline point** - _Validates: Requirements 4.2_
     - **Property 11: Total pack-size and unit-price change identity** - _Validates: Requirements 4.3_
 
-  - [x] 9.3 Implement the shrinkflation endpoint
+  - [ ] 9.3 Implement the shrinkflation endpoint
     - Add `GET /api/v1/shrinkflation/{product_id}` in `app/api/v1/shrinkflation.py`; register the router
     - _Requirements: 4.1, 4.4, 14.4_
 
-  - [ ]* 9.4 Write unit tests for the shrinkflation endpoint
+  - [x]* 9.4 Write unit tests for the shrinkflation endpoint
     - Cover the no-history unavailable message and attribution presence on OFF-sourced vs cited-record points
     - _Requirements: 4.4, 4.5_
 

@@ -652,6 +652,20 @@
         "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
         "timestamp": 1788192242050
       }
+    ],
+    "7.4 Write property tests for the data service": [
+      {
+        "executionId": "52565983-6dd9-4721-8ab8-a6108c356101",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788193299288
+      }
+    ],
+    "9.4 Write unit tests for the shrinkflation endpoint": [
+      {
+        "executionId": "52565983-6dd9-4721-8ab8-a6108c356101",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788193300652
+      }
     ]
   }
 }
