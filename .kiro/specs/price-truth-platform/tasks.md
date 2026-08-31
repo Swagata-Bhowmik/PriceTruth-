@@ -93,7 +93,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add labeling that marks a row `inflated` when the reference price is a category-distribution outlier while the discounted price sits near the norm, and `genuine` otherwise; keep the rule in one documented function for disclosure
     - _Requirements: 2.3, 10.1_
 
-  - [ ] 4.3 Implement the XGBoost training script and model persistence
+  - [x] 4.3 Implement the XGBoost training script and model persistence
     - Create `data/scripts/train_discount_model.py` that engineers features, applies labels, trains the XGBoost binary classifier, and serializes it to `data/models/discount_model.pkl` (joblib)
     - _Requirements: 2.3_
 
@@ -196,11 +196,11 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add `GET /api/v1/shrinkflation/{product_id}` in `app/api/v1/shrinkflation.py`; register the router
     - _Requirements: 4.1, 4.4, 14.4_
 
-  - [x]* 9.4 Write unit tests for the shrinkflation endpoint
+  - [ ]* 9.4 Write unit tests for the shrinkflation endpoint
     - Cover the no-history unavailable message and attribution presence on OFF-sourced vs cited-record points
     - _Requirements: 4.4, 4.5_
 
-- [ ] 10. Cross-Platform Aggregator service and endpoint
+- [x] 10. Cross-Platform Aggregator service and endpoint
   - [x] 10.1 Implement the cross-platform service
     - In `app/services/cross_platform_service.py`, read `platform_prices`, return the price on each Supported Platform that has data, mark the lowest as best deal when >=2 exist, include each entry's product link, and include a genuineness score only when the listing has one; single-platform to no-comparison message; no platform to unavailable message
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
@@ -209,11 +209,11 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 18: Cross-platform entries mirror available data** - _Validates: Requirements 7.1, 7.3, 7.4_
     - **Property 19: Best deal is the minimum platform price** - _Validates: Requirements 7.2_
 
-  - [ ] 10.3 Implement the cross-platform endpoint
+  - [x] 10.3 Implement the cross-platform endpoint
     - Add `GET /api/v1/cross-platform/{product_id}` in `app/api/v1/cross_platform.py`; cache under `crossplatform:{product_id}`; register the router
     - _Requirements: 7.1, 7.3, 14.4_
 
-  - [ ]* 10.4 Write unit tests for the cross-platform endpoint
+  - [x]* 10.4 Write unit tests for the cross-platform endpoint
     - Cover single-platform no-comparison (7.5) and no-platform unavailable (7.6) responses
     - _Requirements: 7.5, 7.6_
 
