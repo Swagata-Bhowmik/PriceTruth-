@@ -39,7 +39,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Create `app/api/v1/meta.py` with `GET /health` that checks DB and Redis connectivity and returns a success status when both are operational; register the router in `main.py`
     - _Requirements: 16.1, 16.4_
 
-  - [ ]* 1.6 Write unit tests for the health endpoint and exception handlers
+  - [x]* 1.6 Write unit tests for the health endpoint and exception handlers
     - Cover healthy path, DB-down 503 with retry message, and error-payload shape for a raised domain error
     - _Requirements: 15.3, 16.1, 16.4_
 
@@ -53,7 +53,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add a `create_all`/lightweight migration entry point wired into local startup and docker-compose
     - _Requirements: 17.5, 18.2_
 
-  - [ ]* 2.3 Write unit tests for models and repositories
+  - [x]* 2.3 Write unit tests for models and repositories
     - Verify each repository uses parameter binding and returns expected shapes against a temporary database
     - _Requirements: 18.2_
 
@@ -62,7 +62,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add small synthetic CSVs under `data/raw/fixtures/` matching the Kaggle Amazon/Flipkart schema (price, reference price, discount, rating, rating count, category, pack quantity) plus a few curated `pack_size_history` rows, so the whole pipeline runs without the real download
     - _Requirements: 17.1_
 
-  - [ ] 3.2 Implement CSV load and cleaning into core tables
+  - [x] 3.2 Implement CSV load and cleaning into core tables
     - Create `data/scripts/ingest.py` that loads CSVs (pandas), strips currency symbols/thousands separators, coerces numeric fields, drops non-positive prices, clamps discount pct to [0,100], normalizes category labels, and populates `products`, `price_snapshots`, and `platform_prices`
     - Default the input path to the synthetic fixtures; accept a path argument for real data
     - _Requirements: 9.5, 17.1_
@@ -137,7 +137,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - In `app/services/data_service.py`, call `GET {OFF_BASE_URL}/api/{OFF_VERSION}/product/{barcode}.json` via `httpx.AsyncClient` with a custom `User-Agent`, a 5-second timeout, and at most 2 retries before returning a data-unavailable status
     - _Requirements: 9.2, 15.2_
 
-  - [ ] 7.2 Implement the Redis caching layer for OFF and results
+  - [x] 7.2 Implement the Redis caching layer for OFF and results
     - Cache validated OFF products under `off:product:{barcode}` (24h) and add cache get/set for the other documented keys; on OFF failure return a cached value when a cache hit exists, else data-unavailable
     - _Requirements: 9.2, 9.4, 12.3_
 
@@ -183,7 +183,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 2.2, 2.5, 2.6_
 
 - [ ] 9. Shrinkflation Timeline service and endpoint
-  - [ ] 9.1 Implement the shrinkflation service
+  - [x] 9.1 Implement the shrinkflation service
     - In `app/services/shrinkflation_service.py`, read `pack_size_history`, return points in chronological order with pack quantity, selling price, computed unit price, and source attribution; compute total percentage change in pack quantity and in unit price when >=2 points exist; return an unavailable message when there is no history
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
@@ -201,7 +201,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 4.4, 4.5_
 
 - [ ] 10. Cross-Platform Aggregator service and endpoint
-  - [ ] 10.1 Implement the cross-platform service
+  - [x] 10.1 Implement the cross-platform service
     - In `app/services/cross_platform_service.py`, read `platform_prices`, return the price on each Supported Platform that has data, mark the lowest as best deal when >=2 exist, include each entry's product link, and include a genuineness score only when the listing has one; single-platform to no-comparison message; no platform to unavailable message
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
@@ -218,7 +218,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 7.5, 7.6_
 
 - [ ] 11. Buy Timing Signal service and endpoint
-  - [ ] 11.1 Implement the seasonality module and buy-timing service
+  - [x] 11.1 Implement the seasonality module and buy-timing service
     - In `app/ml/seasonality.py`, build/read the category seasonal profile (Prophet/statsmodels fit where a monthly index exists, else the Indian sale-calendar prior); in `app/services/buy_timing_service.py`, return `buy_now`/`wait`, attach the deepest-discount window on `wait`, always attach the category-level + snapshot-data disclosure statement, and return unavailable when no profile exists
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 10.1_
 
@@ -235,7 +235,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 6.5, 6.6_
 
 - [ ] 12. Product Search service and endpoints
-  - [ ] 12.1 Implement the search service and manual entry
+  - [x] 12.1 Implement the search service and manual entry
     - In `app/services/search_service.py`, match `products.normalized_name` via Postgres trigram/`ILIKE`, returning name/brand/category per match; empty query to prompt message; zero matches to no-results message + manual-entry affordance; expose a `SelectedProduct` accepted by every feature module; accept manual entry (name, displayed price, reference price, pack quantity) through the same validation
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
