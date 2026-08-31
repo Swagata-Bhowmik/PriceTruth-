@@ -39,21 +39,37 @@ Requirements: 9.2 (5-second timeout), 15.2 (<=2 retries, then data-unavailable).
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Optional, TypedDict
+import hashlib
+import json
+from typing import Any, Callable, Optional, TypedDict
 from urllib.parse import quote
 
 import httpx
 
 from app.core.config import get_settings
 from app.core.logging import get_logger
+from app.db.redis_client import cache_get, cache_set
 
 __all__ = [
     "fetch_off_product",
+    "get_off_product_cached",
+    "cached_or_compute",
+    "cache_get_json",
+    "cache_set_json",
+    "off_product_cache_key",
+    "search_cache_key",
+    "discount_cache_key",
+    "category_stats_cache_key",
+    "cross_platform_cache_key",
     "ok_result",
     "unavailable_result",
     "OffResult",
     "USER_AGENT",
     "OFF_TIMEOUT_SECONDS",
+    "OFF_CACHE_TTL_SECONDS",
+    "SEARCH_CACHE_TTL_SECONDS",
+    "DISCOUNT_CACHE_TTL_SECONDS",
+    "CROSS_PLATFORM_CACHE_TTL_SECONDS",
     "MAX_RETRIES",
     "STATUS_OK",
     "STATUS_UNAVAILABLE",
@@ -335,3 +351,249 @@ async def fetch_off_product(
             },
         )
         return unavailable_result(last_reason)
+
+
+# ===========================================================================
+# Task 7.2 - Redis caching layer for OFF lookups and computed results
+# ===========================================================================
+#
+# This section adds a cache-first wrapper around :func:`fetch_off_product`
+# plus small, reusable JSON cache helpers the other feature services
+# (discount / search / cross-platform / category stats) can share. It builds
+# on ``app.db.redis_client`` (:func:`cache_get` / :func:`cache_set`) and never
+# touches the transport logic above, so Task 7.1's behaviour is preserved.
+#
+# Design references: the "Redis Cache Model" table and the OFF client section
+# of design.md. A cache value is a deterministic JSON function of its inputs,
+# so a cached response equals a freshly computed one within the validity
+# period (Req 9.4, 12.3); the OFF wrapper additionally falls back to a cached
+# product when a live OFF call is unavailable (Req 9.2).
+
+# --- Cache TTLs (seconds), mirroring the design's Redis Cache Model ---------
+
+#: ``off:product:{barcode}`` -> validated OFF product JSON, 24h (Req 9.4, 12.3).
+OFF_CACHE_TTL_SECONDS = 24 * 60 * 60
+#: ``search:{sha1(query)}`` -> search results list, 1h (Req 12.3).
+SEARCH_CACHE_TTL_SECONDS = 60 * 60
+#: ``discount:{category}:{displayed}:{reference}`` -> score+band+SHAP, 1h
+#: (Req 11.1, 12.3).
+DISCOUNT_CACHE_TTL_SECONDS = 60 * 60
+#: ``crossplatform:{product_id}`` -> platform price comparison, 6h (Req 12.3).
+CROSS_PLATFORM_CACHE_TTL_SECONDS = 6 * 60 * 60
+
+
+# --- Cache key builders (one per documented key pattern) --------------------
+
+
+def off_product_cache_key(barcode: str) -> str:
+    """Return the Redis key for a cached OFF product: ``off:product:{barcode}``."""
+
+    return f"off:product:{barcode}"
+
+
+def search_cache_key(query: str) -> str:
+    """Return the Redis key for a cached search result: ``search:{sha1(query)}``.
+
+    The raw query is hashed so arbitrary user text becomes a fixed-length,
+    injection-safe key component.
+    """
+
+    digest = hashlib.sha1(query.encode("utf-8")).hexdigest()
+    return f"search:{digest}"
+
+
+def discount_cache_key(
+    category: str, displayed_price: float, reference_price: float
+) -> str:
+    """Return the Redis key for a cached discount check.
+
+    Shape: ``discount:{category}:{displayed_price}:{reference_price}`` - keyed
+    purely by the inputs that determine the result (Req 12.3).
+    """
+
+    return f"discount:{category}:{displayed_price}:{reference_price}"
+
+
+def category_stats_cache_key(category: str) -> str:
+    """Return the Redis key for cached category statistics: ``category_stats:{category}``."""
+
+    return f"category_stats:{category}"
+
+
+def cross_platform_cache_key(product_id: str) -> str:
+    """Return the Redis key for a cached cross-platform comparison.
+
+    Shape: ``crossplatform:{product_id}``.
+    """
+
+    return f"crossplatform:{product_id}"
+
+
+# --- Reusable JSON cache helpers -------------------------------------------
+#
+# These wrap the raw string get/set from ``redis_client`` with JSON
+# (de)serialisation and best-effort error handling: a cache backend outage or
+# a corrupt value must never break a request, so read failures degrade to a
+# miss and write failures are skipped (Req 15.1 spirit). Callers depend only
+# on the plain get/set names ``cache_get`` / ``cache_set`` at module scope,
+# which keeps them trivially replaceable in tests.
+
+
+def cache_get_json(key: str) -> Optional[Any]:
+    """Return the JSON-decoded value cached under ``key``, or ``None``.
+
+    ``None`` means "treat as a cache miss": the key is absent, the backend is
+    unreachable, or the stored value is not valid JSON (which is logged).
+    """
+
+    try:
+        raw = cache_get(key)
+    except Exception:  # noqa: BLE001 - cache is best-effort; degrade to a miss
+        logger.warning("cache_get_failed", extra={"key": key})
+        return None
+
+    if raw is None:
+        return None
+
+    try:
+        return json.loads(raw)
+    except (ValueError, TypeError):
+        logger.warning("cache_corrupt_value", extra={"key": key})
+        return None
+
+
+def cache_set_json(key: str, value: Any, ttl_seconds: int) -> Optional[Any]:
+    """Serialise ``value`` to JSON and store it under ``key`` with a TTL.
+
+    Returns the JSON-normalised value that was stored (i.e.
+    ``json.loads(json.dumps(value))``) so callers can hand back a value that is
+    identical to what a later cache hit will return - this is what makes a
+    freshly computed response equal to its cached form (Req 9.4, 12.3). Returns
+    ``None`` when the value cannot be serialised or the write fails, in which
+    case nothing is cached.
+    """
+
+    try:
+        serialized = json.dumps(value, sort_keys=True)
+    except (TypeError, ValueError):
+        logger.warning("cache_unserializable_value", extra={"key": key})
+        return None
+
+    try:
+        cache_set(key, serialized, ttl_seconds)
+    except Exception:  # noqa: BLE001 - cache write is best-effort
+        logger.warning("cache_set_failed", extra={"key": key})
+        return None
+
+    return json.loads(serialized)
+
+
+def cached_or_compute(key: str, ttl_seconds: int, compute_fn: Callable[[], Any]) -> Any:
+    """Return a cached JSON result for ``key`` or compute, cache, and return it.
+
+    This is the generic result-cache the discount / search / cross-platform /
+    category-stats services reuse so repeated requests for the same inputs are
+    served from Redis rather than recomputed (Req 12.3). ``compute_fn`` is only
+    invoked on a cache miss and must return a JSON-serialisable value.
+
+    Determinism: on a miss the value is normalised through JSON before being
+    returned, so the value returned on the computing call is identical to the
+    value a subsequent cache hit returns (Req 9.4, 12.3). If the computed value
+    cannot be serialised it is returned as-is and simply not cached.
+
+    Args:
+        key: Fully-qualified Redis key (use the key builders above).
+        ttl_seconds: Cache validity period for this entry.
+        compute_fn: Zero-argument callable producing the fresh result.
+
+    Returns:
+        The cached value on a hit, otherwise the freshly computed value.
+    """
+
+    cached = cache_get_json(key)
+    if cached is not None:
+        logger.debug("result_cache_hit", extra={"key": key})
+        return cached
+
+    fresh = compute_fn()
+    normalized = cache_set_json(key, fresh, ttl_seconds)
+    # ``normalized`` is None only when the value was not cacheable; fall back to
+    # the raw computed value in that case.
+    return normalized if normalized is not None else fresh
+
+
+async def get_off_product_cached(
+    barcode: str,
+    *,
+    force_refresh: bool = False,
+    transport: Optional[httpx.AsyncBaseTransport] = None,
+    ttl_seconds: int = OFF_CACHE_TTL_SECONDS,
+    **fetch_kwargs: Any,
+) -> OffResult:
+    """Cache-first OFF product lookup with a cached-value failure fallback.
+
+    Behaviour (Req 9.2, 9.4, 12.3):
+
+    1. Unless ``force_refresh`` is set, look up ``off:product:{barcode}`` in
+       Redis first; on a hit return the product **without** calling OFF.
+    2. On a miss (or forced refresh) call :func:`fetch_off_product`. On an
+       ``"ok"`` result, cache the product JSON under ``off:product:{barcode}``
+       with a 24h TTL and return it.
+    3. On an ``"unavailable"`` result, fall back to a cached product if one
+       exists (Req 9.2 "return a cached result where a cache hit exists"),
+       otherwise return the unavailable result.
+
+    ``force_refresh`` supports revalidation while still degrading to the last
+    good cached product if OFF is momentarily unavailable. A blank barcode is
+    delegated straight to :func:`fetch_off_product` (which reports
+    ``invalid_barcode`` without any network or cache access).
+
+    Args:
+        barcode: The product barcode to look up.
+        force_refresh: When ``True``, skip the initial cache read and query OFF,
+            still falling back to the cached product if OFF is unavailable.
+        transport: Optional transport override for testing (e.g.
+            :class:`httpx.MockTransport`).
+        ttl_seconds: TTL for the cached product (defaults to 24h).
+        **fetch_kwargs: Forwarded to :func:`fetch_off_product` (e.g. ``timeout``,
+            ``max_retries``, ``backoff_base_seconds``).
+
+    Returns:
+        An :class:`OffResult`, identical in shape to :func:`fetch_off_product`.
+    """
+
+    barcode_str = (barcode or "").strip()
+    if not barcode_str:
+        # No valid key to cache under: let the transport layer report the
+        # invalid barcode (no network call, no cache access).
+        return await fetch_off_product(barcode, transport=transport, **fetch_kwargs)
+
+    key = off_product_cache_key(barcode_str)
+
+    # 1. Cache-first read (skipped on a forced refresh).
+    if not force_refresh:
+        cached = cache_get_json(key)
+        if cached is not None:
+            logger.debug("off_cache_hit", extra={"barcode": barcode_str})
+            return ok_result(cached)
+
+    # 2. Cache miss or forced refresh: consult OFF via the Task 7.1 client.
+    result = await fetch_off_product(barcode_str, transport=transport, **fetch_kwargs)
+
+    if result["status"] == STATUS_OK:
+        # Store the product payload for 24h. Task 7.3 will validate/shape the
+        # payload before this cache write; the transport result is used as-is
+        # for now.
+        cache_set_json(key, result["product"], ttl_seconds)
+        return result
+
+    # 3. OFF unavailable: serve the last cached product if we have one.
+    cached = cache_get_json(key)
+    if cached is not None:
+        logger.info(
+            "off_cache_fallback_on_unavailable",
+            extra={"barcode": barcode_str, "reason": result["reason"]},
+        )
+        return ok_result(cached)
+
+    return result
