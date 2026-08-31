@@ -14,6 +14,7 @@ from sqlalchemy.exc import OperationalError
 from app.api.v1 import (
     buy_timing,
     cross_platform,
+    dashboard,
     discount,
     meta,
     search,
@@ -199,6 +200,10 @@ app.include_router(search.router, prefix="/api/v1", tags=["Search"])
 # True Discount Checker: POST /api/v1/discount-check - genuineness score,
 # classification, and the SHAP breakdown (Req 2.4, 3.1, 3.2, 3.3, 3.5, 11.3, 18.1).
 app.include_router(discount.router, prefix="/api/v1", tags=["Discount Checker"])
+
+# Composite Dashboard: GET /api/v1/dashboard/{product_id} - composes all five
+# feature modules for a product with per-module containment (Req 8.1, 8.5, 15.1, 14.4).
+app.include_router(dashboard.router, prefix="/api/v1", tags=["Dashboard"])
 
 
 # Import routers (will be added in later phases)

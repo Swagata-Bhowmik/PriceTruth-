@@ -178,7 +178,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 7: SHAP contribution direction matches its sign** - _Validates: Requirements 3.2_
     - **Property 8: SHAP contributions reconcile to the result** - _Validates: Requirements 3.3_
 
-  - [x]* 8.5 Write unit/API tests for limited verification and not-evaluable paths
+  - [ ]* 8.5 Write unit/API tests for limited verification and not-evaluable paths
     - Cover the 200 limited-verification body (stats missing), the 422 not-evaluable body (bad reference), and boundary scores 59/60/89/90
     - _Requirements: 2.2, 2.5, 2.6_
 
@@ -251,7 +251,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 1.1, 1.4, 1.5_
 
 - [ ] 13. Composite Dashboard and data-sources endpoints
-  - [ ] 13.1 Implement the composite dashboard endpoint with per-module containment
+  - [x] 13.1 Implement the composite dashboard endpoint with per-module containment
     - Add `GET /api/v1/dashboard/{product_id}` in `app/api/v1/dashboard.py` that calls each feature service independently, wrapping each in try/except so one failing module returns its unavailable payload while the others succeed; register the router
     - _Requirements: 8.1, 8.5, 15.1_
 
@@ -259,7 +259,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add `GET /api/v1/data-sources` in `app/api/v1/meta.py` describing data sources and known limitations, the crowd-sourced OFF notice, the category-level/snapshot disclosure, and the statement that live Amazon/Flipkart scraping is not a core data source
     - _Requirements: 10.2, 10.3, 10.4_
 
-  - [ ]* 13.3 Write unit/API tests for containment and disclosure
+  - [x]* 13.3 Write unit/API tests for containment and disclosure
     - Verify a thrown module error is contained (others still return) and the data-sources payload contains all required disclosures
     - _Requirements: 8.5, 10.2, 10.4, 15.1_
 

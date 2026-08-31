@@ -465,6 +465,11 @@
         "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
         "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
         "timestamp": 1788109478531
+      },
+      {
+        "executionId": "5c4ab722-29ee-4cf3-a117-c15abc6edd53",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788202072000
       }
     ],
     "13.2 Implement the data-sources disclosure endpoint": [
@@ -800,6 +805,13 @@
         "executionId": "d1085a7c-59ed-459d-9ddb-f55ecd0fdbb0",
         "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
         "timestamp": 1788198599208
+      }
+    ],
+    "13.3 Write unit/API tests for containment and disclosure": [
+      {
+        "executionId": "5c4ab722-29ee-4cf3-a117-c15abc6edd53",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788202073249
       }
     ]
   }
