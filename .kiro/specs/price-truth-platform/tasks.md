@@ -279,8 +279,8 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
 - [ ] 15. Checkpoint - backend complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 16. Frontend foundation
-  - [ ] 16.1 Set up Vite + React 18 + Tailwind and install dependencies
+- [x] 16. Frontend foundation
+  - [x] 16.1 Set up Vite + React 18 + Tailwind and install dependencies
     - Initialize the Vite React app in `frontend/`, wire Tailwind, install the listed dependencies plus dev dependency `fast-check`, and configure the three responsive breakpoints (<=480 single column, 481-1023 tablet, >=1024 desktop grid)
     - _Requirements: 14.1, 14.2, 14.3_
 
@@ -292,24 +292,24 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Cover `ErrorBoundary` containment, `UnavailableState` rendering, `LoadingSkeleton` while pending, and focus-indicator presence
     - _Requirements: 8.4, 8.5, 19.3_
 
-- [ ] 17. Frontend feature cards and charts
-  - [ ] 17.1 Implement DiscountCheckerCard with the SHAP waterfall
+- [x] 17. Frontend feature cards and charts
+  - [x] 17.1 Implement DiscountCheckerCard with the SHAP waterfall
     - Show the classification label (text + color) as the primary conclusion; expand on hover/keyboard to a Plotly SHAP waterfall with base value and contributions
     - _Requirements: 2.4, 3.2, 8.3, 19.2, 19.4_
 
-  - [ ] 17.2 Implement ShrinkflationCard with the timeline chart
+  - [x] 17.2 Implement ShrinkflationCard with the timeline chart
     - Primary conclusion first; expandable Recharts timeline of pack size and unit price with source attribution and a text alternative
     - _Requirements: 4.1, 4.4, 8.3, 19.4, 19.5_
 
-  - [ ] 17.3 Implement UnitPriceCard with comparison bars
+  - [x] 17.3 Implement UnitPriceCard with comparison bars
     - Show the best-value variant first; expand to per-variant price/quantity/unit-price bars with a text alternative
     - _Requirements: 5.2, 5.3, 8.3, 19.4, 19.5_
 
-  - [ ] 17.4 Implement BuyTimingCard with the seasonality view
+  - [x] 17.4 Implement BuyTimingCard with the seasonality view
     - Show buy-now/wait first with the category-level + snapshot disclosure; expand to the seasonal window view
     - _Requirements: 6.1, 6.2, 6.4, 8.3, 10.1_
 
-  - [ ] 17.5 Implement CrossPlatformCard with platform bars
+  - [x] 17.5 Implement CrossPlatformCard with platform bars
     - Show the best deal first; expand to per-platform prices with product links and any genuineness score
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 8.3_
 
