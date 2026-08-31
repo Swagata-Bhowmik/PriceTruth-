@@ -7,6 +7,14 @@
     "9.2 Write property tests for the shrinkflation timeline": {
       "status": "passed",
       "lastRunTimestamp": 1788188087114
+    },
+    "12.2 Write property test for search result shaping": {
+      "status": "passed",
+      "lastRunTimestamp": 1788189975040
+    },
+    "10.2 Write property tests for the cross-platform aggregator": {
+      "status": "passed",
+      "lastRunTimestamp": 1788190146200
     }
   },
   "executionHistory": {
@@ -579,6 +587,41 @@
         "executionId": "9c055f53-9fbd-4a91-97c6-e31899af8d60",
         "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
         "timestamp": 1788189213289
+      }
+    ],
+    "10.2 Write property tests for the cross-platform aggregator": [
+      {
+        "executionId": "c6508607-0bfb-465c-b5fe-16978710e377",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788190920020
+      }
+    ],
+    "11.2 Write property tests for buy-timing": [
+      {
+        "executionId": "c6508607-0bfb-465c-b5fe-16978710e377",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788190921310
+      }
+    ],
+    "12.2 Write property test for search result shaping": [
+      {
+        "executionId": "c6508607-0bfb-465c-b5fe-16978710e377",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788190922176
+      }
+    ],
+    "6.4 Write unit and API tests for the comparator endpoint": [
+      {
+        "executionId": "c6508607-0bfb-465c-b5fe-16978710e377",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788190923225
+      }
+    ],
+    "7.5 Write unit tests for retries, timeout, and cache fallback": [
+      {
+        "executionId": "c6508607-0bfb-465c-b5fe-16978710e377",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788190926820
       }
     ]
   }

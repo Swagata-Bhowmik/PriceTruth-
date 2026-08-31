@@ -128,7 +128,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add `POST /api/v1/unit-price/compare` in `app/api/v1/unit_price.py` with the `VariantIn` Pydantic model (unit pattern `^(g|kg|ml|l)$`); register the router in `main.py`
     - _Requirements: 5.3, 14.4, 18.1_
 
-  - [ ]* 6.4 Write unit and API tests for the comparator endpoint
+  - [x]* 6.4 Write unit and API tests for the comparator endpoint
     - Cover the example from the design, mixed-unit conversion, and the excluded-variant response shape
     - _Requirements: 5.3, 5.5, 15.3_
 
@@ -152,7 +152,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 22: External and input values are validated before use** - _Validates: Requirements 9.5, 15.4, 18.1_
     - **Property 24: OFF-derived results disclose their crowd-sourced origin** - _Validates: Requirements 10.3_
 
-  - [ ]* 7.5 Write unit tests for retries, timeout, and cache fallback
+  - [x]* 7.5 Write unit tests for retries, timeout, and cache fallback
     - Cover timeout to retry (<=2) to data-unavailable, cache-hit-on-failure, and data-unavailable propagation to a consuming module
     - _Requirements: 9.2, 9.3, 15.2_
 
@@ -187,7 +187,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - In `app/services/shrinkflation_service.py`, read `pack_size_history`, return points in chronological order with pack quantity, selling price, computed unit price, and source attribution; compute total percentage change in pack quantity and in unit price when >=2 points exist; return an unavailable message when there is no history
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [x]* 9.2 Write property tests for the shrinkflation timeline
+  - [ ]* 9.2 Write property tests for the shrinkflation timeline
     - **Property 9: Shrinkflation timeline is ordered and attributed** - _Validates: Requirements 4.1, 4.4_
     - **Property 10: Unit price identity at each timeline point** - _Validates: Requirements 4.2_
     - **Property 11: Total pack-size and unit-price change identity** - _Validates: Requirements 4.3_
@@ -205,7 +205,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - In `app/services/cross_platform_service.py`, read `platform_prices`, return the price on each Supported Platform that has data, mark the lowest as best deal when >=2 exist, include each entry's product link, and include a genuineness score only when the listing has one; single-platform to no-comparison message; no platform to unavailable message
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
-  - [ ]* 10.2 Write property tests for the cross-platform aggregator
+  - [x]* 10.2 Write property tests for the cross-platform aggregator
     - **Property 18: Cross-platform entries mirror available data** - _Validates: Requirements 7.1, 7.3, 7.4_
     - **Property 19: Best deal is the minimum platform price** - _Validates: Requirements 7.2_
 
@@ -222,7 +222,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - In `app/ml/seasonality.py`, build/read the category seasonal profile (Prophet/statsmodels fit where a monthly index exists, else the Indian sale-calendar prior); in `app/services/buy_timing_service.py`, return `buy_now`/`wait`, attach the deepest-discount window on `wait`, always attach the category-level + snapshot-data disclosure statement, and return unavailable when no profile exists
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 10.1_
 
-  - [ ]* 11.2 Write property tests for buy-timing
+  - [x]* 11.2 Write property tests for buy-timing
     - **Property 16: Buy-timing output is category-level, bounded, and disclosed** - _Validates: Requirements 6.1, 6.3, 6.4, 10.1_
     - **Property 17: A "wait" recommendation points to the deepest-discount window** - _Validates: Requirements 6.2_
 
@@ -239,7 +239,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - In `app/services/search_service.py`, match `products.normalized_name` via Postgres trigram/`ILIKE`, returning name/brand/category per match; empty query to prompt message; zero matches to no-results message + manual-entry affordance; expose a `SelectedProduct` accepted by every feature module; accept manual entry (name, displayed price, reference price, pack quantity) through the same validation
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
-  - [ ]* 12.2 Write property test for search result shaping
+  - [x]* 12.2 Write property test for search result shaping
     - **Property 1: Search results always carry identifying fields** - _Validates: Requirements 1.2_
 
   - [ ] 12.3 Implement the search and manual-entry endpoints
