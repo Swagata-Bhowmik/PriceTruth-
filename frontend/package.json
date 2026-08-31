@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css,md}\""
   },
@@ -37,7 +39,14 @@
     "prettier": "^3.1.1",
     "tailwindcss": "^3.3.6",
     "postcss": "^8.4.32",
-    "autoprefixer": "^10.4.16"
+    "autoprefixer": "^10.4.16",
+    "vitest": "^1.6.0",
+    "@testing-library/react": "^14.2.1",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/user-event": "^14.5.2",
+    "jsdom": "^24.1.0",
+    "jest-axe": "^8.0.0",
+    "fast-check": "^3.19.0"
   },
   "author": "Group 11 - Swagata, Charvi, Yashwi",
   "license": "Academic"

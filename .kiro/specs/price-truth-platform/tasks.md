@@ -280,7 +280,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 16. Frontend foundation
-  - [ ] 16.1 Set up Vite + React 18 + Tailwind and install dependencies
+  - [x] 16.1 Set up Vite + React 18 + Tailwind and install dependencies
     - Initialize the Vite React app in `frontend/`, wire Tailwind, install the listed dependencies plus dev dependency `fast-check`, and configure the three responsive breakpoints (<=480 single column, 481-1023 tablet, >=1024 desktop grid)
     - _Requirements: 14.1, 14.2, 14.3_
 
