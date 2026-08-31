@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
+from app.api.v1 import meta
 from app.core.errors import AppError, ErrorPayload
 
 app = FastAPI(
@@ -98,13 +99,11 @@ async def root():
     }
 
 
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "service": "price-truth-api"
-    }
+# Root-level meta router. Registered without a prefix so GET /health resolves
+# at the application root (liveness + DB/Redis connectivity check), not under
+# /api/v1 (Req 16.1, 16.4). This real check replaces the former static
+# placeholder that always reported healthy.
+app.include_router(meta.router)
 
 
 # Import routers (will be added in later phases)

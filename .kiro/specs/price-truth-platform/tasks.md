@@ -15,7 +15,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
 
 ## Tasks
 
-- [ ] 1. Backend configuration and error-handling foundation
+- [x] 1. Backend configuration and error-handling foundation
   - [x] 1.1 Add dependencies and implement the settings module
     - Add `hypothesis`, `slowapi` (rate limiting), and confirm `pytest`, `pytest-cov`, `httpx` are present in `backend/requirements.txt`
     - Create `app/core/config.py` using `pydantic-settings` to read `DATABASE_URL`, `REDIS_URL`, `OFF_BASE_URL`, `OFF_VERSION`, and `CORS_ALLOWED_ORIGIN` from environment variables (no hardcoded endpoints or secrets)
@@ -35,7 +35,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Create `app/db/session.py` (engine, session factory, `get_db` dependency) and `app/db/redis_client.py` (get/set with TTL), both reading connection details from settings
     - _Requirements: 15.4, 16.4, 17.5_
 
-  - [ ] 1.5 Implement the health endpoint
+  - [x] 1.5 Implement the health endpoint
     - Create `app/api/v1/meta.py` with `GET /health` that checks DB and Redis connectivity and returns a success status when both are operational; register the router in `main.py`
     - _Requirements: 16.1, 16.4_
 
@@ -43,12 +43,12 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Cover healthy path, DB-down 503 with retry message, and error-payload shape for a raised domain error
     - _Requirements: 15.3, 16.1, 16.4_
 
-- [ ] 2. Database models and repositories
+- [x] 2. Database models and repositories
   - [x] 2.1 Implement SQLAlchemy 2.0 models for the six tables
     - In `app/db/models.py`, define `products`, `category_price_stats`, `price_snapshots`, `pack_size_history`, `platform_prices`, `category_seasonality` per the ER diagram, including the nullable `platform_prices.genuineness_score` and the attribution columns on `pack_size_history`
     - _Requirements: 17.5_
 
-  - [ ] 2.2 Implement repository helpers and table creation
+  - [x] 2.2 Implement repository helpers and table creation
     - In `app/db/repositories.py`, add parameter-bound query helpers (no string concatenation of user input) for reading products, category stats, pack-size history, platform prices, and seasonality
     - Add a `create_all`/lightweight migration entry point wired into local startup and docker-compose
     - _Requirements: 17.5, 18.2_
@@ -133,7 +133,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 5.3, 5.5, 15.3_
 
 - [ ] 7. Data Service (Open Food Facts client, caching, validation)
-  - [ ] 7.1 Implement the OFF client with timeout and bounded retries
+  - [x] 7.1 Implement the OFF client with timeout and bounded retries
     - In `app/services/data_service.py`, call `GET {OFF_BASE_URL}/api/{OFF_VERSION}/product/{barcode}.json` via `httpx.AsyncClient` with a custom `User-Agent`, a 5-second timeout, and at most 2 retries before returning a data-unavailable status
     - _Requirements: 9.2, 15.2_
 
