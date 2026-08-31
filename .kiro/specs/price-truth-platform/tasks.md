@@ -280,15 +280,15 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 16. Frontend foundation
-  - [x] 16.1 Set up Vite + React 18 + Tailwind and install dependencies
+  - [ ] 16.1 Set up Vite + React 18 + Tailwind and install dependencies
     - Initialize the Vite React app in `frontend/`, wire Tailwind, install the listed dependencies plus dev dependency `fast-check`, and configure the three responsive breakpoints (<=480 single column, 481-1023 tablet, >=1024 desktop grid)
     - _Requirements: 14.1, 14.2, 14.3_
 
-  - [ ] 16.2 Implement the API client and shared components
+  - [x] 16.2 Implement the API client and shared components
     - Add a typed API client (HTTPS/JSON) for all endpoints and shared components `Card`, `LoadingSkeleton`, `UnavailableState`, `ErrorBoundary`, `FocusableControl` with a visible keyboard focus indicator and contrast-compliant color tokens
     - _Requirements: 8.4, 8.5, 14.4, 19.1, 19.3_
 
-  - [ ]* 16.3 Write component tests for shared components
+  - [x]* 16.3 Write component tests for shared components
     - Cover `ErrorBoundary` containment, `UnavailableState` rendering, `LoadingSkeleton` while pending, and focus-indicator presence
     - _Requirements: 8.4, 8.5, 19.3_
 
