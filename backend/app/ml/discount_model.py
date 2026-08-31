@@ -74,6 +74,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -92,8 +93,10 @@ __all__ = [
     "engineer_features",
     "engineer_features_frame",
     "features_to_vector",
+    "get_model",
     "label_frame",
     "label_row",
+    "predict_genuineness",
 ]
 
 # ---------------------------------------------------------------------------
@@ -509,3 +512,135 @@ def label_frame(
     labels = (~inflated).astype(int)
     labels.name = "label"
     return labels
+
+
+# ---------------------------------------------------------------------------
+# Load-once inference (task 4.4, Req 2.3 / 11.2 / 12.4)
+# ---------------------------------------------------------------------------
+# The trained classifier (task 4.3) is a bare ``xgboost.sklearn.XGBClassifier``
+# serialized with joblib to :data:`MODEL_PATH`. Non-functional requirements
+# 11.2 (inference latency) and 12.4 (load the model once per process and reuse
+# it) forbid re-reading the ~KB pickle on every request, so :func:`get_model`
+# is memoized with ``functools.lru_cache(maxsize=1)``: the first call loads and
+# caches the instance; every later call returns that same object. A single
+# process therefore holds exactly one model, which the SHAP ``TreeExplainer``
+# (task 4.5, ``app/ml/explainer.py``) is built from as well, so the score and
+# its explanation always come from *the same* fitted model (Req 3.4).
+#
+# The loader is **total**: a missing or unreadable pickle logs a warning through
+# the structured logger and returns ``None`` (the ``None`` is cached too, so a
+# missing model is not re-probed on every request). Startup wiring in
+# ``app/main.py`` treats a ``None`` model as "scoring disabled" and continues to
+# serve the rest of the API rather than crashing (Req 15.1). Both ``joblib`` and
+# the logger are imported lazily inside the function so that merely importing
+# this module stays cheap for the request-time feature path (see the module
+# docstring), and joblib is only required in a process that actually loads a
+# model.
+
+
+@lru_cache(maxsize=1)
+def get_model() -> Optional[Any]:
+    """Return the process-wide discount model, loading it at most once (Req 12.4).
+
+    The fitted XGBoost classifier is read from :data:`MODEL_PATH` with joblib on
+    the first call and cached; subsequent calls return the identical object
+    (verifiable with ``get_model() is get_model()``), so inference and the SHAP
+    explainer share one instance and never pay the load cost per request
+    (Req 11.2, 12.4).
+
+    Returns:
+        The loaded model, or ``None`` when the pickle is missing or cannot be
+        deserialized. In the ``None`` case a warning is logged and the ``None``
+        is cached, so the application can still start and serve every other
+        feature (Req 15.1); scoring simply reports as unavailable upstream.
+
+    Notes:
+        Tests that create, remove, or swap the model artefact can reset the
+        one-shot cache with ``get_model.cache_clear()``.
+    """
+
+    # Local imports keep this module's import cost minimal for the pure feature
+    # transform path and avoid a hard joblib dependency for importers that never
+    # load a model.
+    from app.core.logging import get_logger
+
+    logger = get_logger(__name__)
+
+    if not MODEL_PATH.exists():
+        logger.warning(
+            "Discount model file is missing; genuineness scoring is disabled.",
+            extra={"model_path": str(MODEL_PATH)},
+        )
+        return None
+
+    try:
+        import joblib
+
+        model = joblib.load(MODEL_PATH)
+    except Exception as exc:  # noqa: BLE001 - any load failure must degrade, not crash
+        logger.warning(
+            "Failed to load the discount model; genuineness scoring is disabled.",
+            extra={"model_path": str(MODEL_PATH), "error": repr(exc)},
+        )
+        return None
+
+    logger.info("Loaded discount model.", extra={"model_path": str(MODEL_PATH)})
+    return model
+
+
+def predict_genuineness(
+    features: Mapping[str, float],
+    model: Optional[Any] = None,
+) -> float:
+    """Compute ``p(genuine)`` in [0, 1] for one engineered feature mapping (Req 2.3).
+
+    Orders ``features`` into the model input row through :func:`features_to_vector`
+    (so the column order can never drift from :data:`FEATURE_NAMES`), runs the
+    classifier's ``predict_proba``, and returns the probability of the **genuine**
+    class. The genuine column is located via the model's ``classes_`` rather than
+    assumed to be a fixed index, matching the training convention where
+    ``classes_ == [inflated(0), genuine(1)]``.
+
+    Args:
+        features: Feature mapping from :func:`engineer_features` (extra keys are
+            ignored, missing keys default to ``0.0`` via
+            :func:`features_to_vector`).
+        model: An already-loaded model to score with. Defaults to the
+            process-wide instance from :func:`get_model`, so the common path
+            reuses the single loaded model (Req 12.4). Passing an explicit model
+            (e.g. the one stashed on ``app.state``) avoids the cache lookup.
+
+    Returns:
+        ``p(genuine)`` as a float in the closed interval [0, 1]. The value is
+        clamped defensively so the range holds exactly despite floating-point
+        drift; this backs the score-range guarantee the service layer maps to
+        [0, 100] (Req 2.1).
+
+    Raises:
+        RuntimeError: if no model is available (none supplied and none loaded).
+            Callers that must degrade gracefully should check model availability
+            first; the missing-model path is handled at startup/service level.
+    """
+
+    if model is None:
+        model = get_model()
+    if model is None:
+        raise RuntimeError(
+            "The discount model is unavailable; cannot compute a genuineness probability."
+        )
+
+    vector = features_to_vector(features)
+    proba = model.predict_proba([vector])
+
+    classes = list(getattr(model, "classes_", (LABEL_INFLATED, LABEL_GENUINE)))
+    genuine_index = (
+        classes.index(LABEL_GENUINE) if LABEL_GENUINE in classes else len(classes) - 1
+    )
+    p_genuine = float(proba[0][genuine_index])
+
+    # predict_proba is already in [0, 1]; clamp to keep the contract exact.
+    if p_genuine < 0.0:
+        return 0.0
+    if p_genuine > 1.0:
+        return 1.0
+    return p_genuine

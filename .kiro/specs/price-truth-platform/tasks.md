@@ -84,7 +84,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Test price parsing, discount clamping, invalid-row dropping, and category-stat correctness on the fixtures
     - _Requirements: 2.3, 9.5_
 
-- [ ] 4. Machine learning pipeline
+- [x] 4. Machine learning pipeline
   - [x] 4.1 Implement snapshot-aware feature engineering
     - In `app/ml/discount_model.py`, implement the feature transform from `(displayed_price, reference_price, category_stats)` into the documented features (`claimed_discount_pct`, `discount_vs_category_z`, `displayed_price_z`, `reference_price_z`, `displayed_vs_median`, `reference_vs_p75`, and review-signal features)
     - _Requirements: 2.3_
@@ -97,11 +97,11 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Create `data/scripts/train_discount_model.py` that engineers features, applies labels, trains the XGBoost binary classifier, and serializes it to `data/models/discount_model.pkl` (joblib)
     - _Requirements: 2.3_
 
-  - [ ] 4.4 Implement the load-once inference module
+  - [x] 4.4 Implement the load-once inference module
     - Load the serialized model into FastAPI app state at startup (in `main.py`) and expose a reusable `predict_proba` in `app/ml/discount_model.py`; ensure the model is loaded exactly once per process
     - _Requirements: 2.3, 11.2, 12.4_
 
-  - [ ] 4.5 Implement the SHAP explainer with plain-language labels
+  - [x] 4.5 Implement the SHAP explainer with plain-language labels
     - In `app/ml/explainer.py`, build a single `shap.TreeExplainer` from the same loaded model instance; return base value and per-feature contributions in margin space
     - Add `app/ml/feature_labels.py` mapping raw feature names to plain-language labels
     - _Requirements: 3.1, 3.4, 3.5_
@@ -213,7 +213,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add `GET /api/v1/cross-platform/{product_id}` in `app/api/v1/cross_platform.py`; cache under `crossplatform:{product_id}`; register the router
     - _Requirements: 7.1, 7.3, 14.4_
 
-  - [x]* 10.4 Write unit tests for the cross-platform endpoint
+  - [ ]* 10.4 Write unit tests for the cross-platform endpoint
     - Cover single-platform no-comparison (7.5) and no-platform unavailable (7.6) responses
     - _Requirements: 7.5, 7.6_
 

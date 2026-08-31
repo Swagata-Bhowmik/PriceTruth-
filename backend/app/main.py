@@ -2,6 +2,8 @@
 Price Truth - FastAPI Main Application Entry Point
 """
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -11,13 +13,79 @@ from sqlalchemy.exc import OperationalError
 
 from app.api.v1 import cross_platform, meta, shrinkflation, unit_price
 from app.core.errors import AppError, ErrorPayload
+from app.core.logging import get_logger
+from app.ml.discount_model import get_model
+from app.ml.explainer import get_explainer
+
+
+# ---------------------------------------------------------------------------
+# Startup / shutdown lifespan
+#
+# The discount model and its SHAP explainer are loaded exactly once per process
+# and stashed on ``app.state`` so request handlers reuse a single instance
+# instead of re-reading the pickle or rebuilding the explainer per call
+# (Req 11.2, 11.3, 12.4). ``get_model`` / ``get_explainer`` are themselves
+# memoized, so ``app.state`` simply references those cached singletons.
+#
+# A missing or unloadable model MUST NOT crash startup: both loaders already log
+# a warning and return ``None``, and the block below defends further so the app
+# still boots and serves every other feature (Req 15.1). Scoring/explanation
+# just report as unavailable to their consumers.
+# ---------------------------------------------------------------------------
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Load the model + SHAP explainer once at startup into ``app.state``."""
+    logger = get_logger(__name__)
+
+    model = None
+    explainer = None
+    try:
+        model = get_model()
+    except Exception:  # noqa: BLE001 - loader already guards; stay boot-safe
+        logger.warning(
+            "Unexpected error loading the discount model at startup; "
+            "genuineness scoring is disabled.",
+            exc_info=True,
+        )
+        model = None
+
+    if model is None:
+        logger.warning(
+            "Discount model unavailable at startup; scoring and SHAP "
+            "explanations are disabled."
+        )
+    else:
+        try:
+            explainer = get_explainer()
+        except Exception:  # noqa: BLE001 - builder already guards; stay boot-safe
+            logger.warning(
+                "Unexpected error building the SHAP explainer at startup; "
+                "explanations are disabled.",
+                exc_info=True,
+            )
+            explainer = None
+        if explainer is None:
+            logger.warning(
+                "SHAP explainer unavailable at startup; explanations are disabled."
+            )
+
+    app.state.discount_model = model
+    app.state.discount_explainer = explainer
+
+    yield
+
+    # No teardown needed: the cached singletons live for the process lifetime.
+
 
 app = FastAPI(
     title="Price Truth API",
     description="ML-powered e-commerce discount verification and shrinkflation tracking",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # CORS Configuration
