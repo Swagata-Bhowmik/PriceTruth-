@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
-from app.api.v1 import meta, unit_price
+from app.api.v1 import meta, shrinkflation, unit_price
 from app.core.errors import AppError, ErrorPayload
 
 app = FastAPI(
@@ -107,6 +107,9 @@ app.include_router(meta.router)
 
 # Unit Price Comparator: POST /api/v1/unit-price/compare (Req 5.3, 14.4, 18.1).
 app.include_router(unit_price.router, prefix="/api/v1", tags=["Unit Price"])
+
+# Shrinkflation Timeline: GET /api/v1/shrinkflation/{product_id} (Req 4.1, 4.4, 14.4).
+app.include_router(shrinkflation.router, prefix="/api/v1", tags=["Shrinkflation"])
 
 
 # Import routers (will be added in later phases)

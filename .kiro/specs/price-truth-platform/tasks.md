@@ -71,7 +71,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Extend ingestion to reduce ingested rows into per-category distribution stats (mean/median/std/p25/p75 price, mean/std discount pct, rating norms, sample size) and populate `category_price_stats`
     - _Requirements: 2.3_
 
-  - [ ] 3.4 Compute and persist category seasonality
+  - [x] 3.4 Compute and persist category seasonality
     - Derive a per-category monthly `relative_price_index`, mark the best window, and map the Indian sale calendar (Big Billion Days, Republic Day Sale, Diwali, Prime Day) into `category_seasonality.sale_event`
     - _Requirements: 6.2, 6.5_
 
@@ -80,7 +80,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Depends on the user providing Kaggle API credentials and downloading the CSVs when prompted; the synthetic fixtures keep every downstream task runnable until then**
     - _Requirements: 13.4, 17.1_
 
-  - [ ]* 3.6 Write unit tests for cleaning and statistics computation
+  - [x]* 3.6 Write unit tests for cleaning and statistics computation
     - Test price parsing, discount clamping, invalid-row dropping, and category-stat correctness on the fixtures
     - _Requirements: 2.3, 9.5_
 
@@ -89,7 +89,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - In `app/ml/discount_model.py`, implement the feature transform from `(displayed_price, reference_price, category_stats)` into the documented features (`claimed_discount_pct`, `discount_vs_category_z`, `displayed_price_z`, `reference_price_z`, `displayed_vs_median`, `reference_vs_p75`, and review-signal features)
     - _Requirements: 2.3_
 
-  - [ ] 4.2 Implement the transparent weak-supervision labeling rule
+  - [x] 4.2 Implement the transparent weak-supervision labeling rule
     - Add labeling that marks a row `inflated` when the reference price is a category-distribution outlier while the discounted price sits near the norm, and `genuine` otherwise; keep the rule in one documented function for disclosure
     - _Requirements: 2.3, 10.1_
 
@@ -152,7 +152,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 22: External and input values are validated before use** - _Validates: Requirements 9.5, 15.4, 18.1_
     - **Property 24: OFF-derived results disclose their crowd-sourced origin** - _Validates: Requirements 10.3_
 
-  - [x]* 7.5 Write unit tests for retries, timeout, and cache fallback
+  - [ ]* 7.5 Write unit tests for retries, timeout, and cache fallback
     - Cover timeout to retry (<=2) to data-unavailable, cache-hit-on-failure, and data-unavailable propagation to a consuming module
     - _Requirements: 9.2, 9.3, 15.2_
 
@@ -182,7 +182,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Cover the 200 limited-verification body (stats missing), the 422 not-evaluable body (bad reference), and boundary scores 59/60/89/90
     - _Requirements: 2.2, 2.5, 2.6_
 
-- [ ] 9. Shrinkflation Timeline service and endpoint
+- [x] 9. Shrinkflation Timeline service and endpoint
   - [x] 9.1 Implement the shrinkflation service
     - In `app/services/shrinkflation_service.py`, read `pack_size_history`, return points in chronological order with pack quantity, selling price, computed unit price, and source attribution; compute total percentage change in pack quantity and in unit price when >=2 points exist; return an unavailable message when there is no history
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
@@ -192,7 +192,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 10: Unit price identity at each timeline point** - _Validates: Requirements 4.2_
     - **Property 11: Total pack-size and unit-price change identity** - _Validates: Requirements 4.3_
 
-  - [ ] 9.3 Implement the shrinkflation endpoint
+  - [x] 9.3 Implement the shrinkflation endpoint
     - Add `GET /api/v1/shrinkflation/{product_id}` in `app/api/v1/shrinkflation.py`; register the router
     - _Requirements: 4.1, 4.4, 14.4_
 

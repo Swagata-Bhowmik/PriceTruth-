@@ -25,24 +25,32 @@ vectors for the task report (visible under ``pytest -s``).
 import math
 
 from app.ml.discount_model import (
+    DISPLAYED_NORM_BAND_Z,
     FEATURE_NAMES,
+    LABEL_GENUINE,
+    LABEL_INFLATED,
     MAX_STAR_RATING,
+    REFERENCE_OUTLIER_Z,
     engineer_features,
     engineer_features_frame,
     features_to_vector,
+    label_frame,
+    label_row,
 )
 
 # A representative category distribution. ``mean_discount_pct`` / ``std`` are
-# expressed as fractions to match ``claimed_discount_pct`` (see the module's
-# unit-consistency note).
+# expressed as **percentages** in [0, 100] to match how ingestion (task 3.3)
+# stores them - reduced from the ``discount_pct`` column. ``claimed_discount_pct``
+# is a fraction and the transform scales it by 100 before standardising, so
+# ``discount_vs_category_z`` is unit-consistent (see the module docstring).
 CATEGORY_STATS = {
     "mean_price": 1000.0,
     "median_price": 1000.0,
     "std_price": 300.0,
     "p25_price": 800.0,
     "p75_price": 1200.0,
-    "mean_discount_pct": 0.15,
-    "std_discount_pct": 0.10,
+    "mean_discount_pct": 15.0,
+    "std_discount_pct": 10.0,
     "mean_rating": 4.0,
     "mean_rating_count": 500.0,
 }
@@ -67,8 +75,11 @@ def test_inflated_listing_flags_high_reference_z_and_discount():
     # (5000 - 1000) / 300 == 13.33..., (5000 - 1000) / 5000 == 0.8
     assert math.isclose(inflated["reference_price_z"], 4000.0 / 300.0, rel_tol=1e-9)
     assert math.isclose(inflated["claimed_discount_pct"], 0.8, rel_tol=1e-9)
-    # The claimed discount is far above the category norm.
+    # The claimed discount is far above the category norm. Unit-consistent:
+    # claimed_discount_pct is scaled to a percentage (0.8 -> 80) before it is
+    # compared against the percentage category stats, so z = (80 - 15) / 10 = 6.5.
     assert inflated["discount_vs_category_z"] > 3.0
+    assert math.isclose(inflated["discount_vs_category_z"], 6.5, rel_tol=1e-9)
 
 
 def test_genuine_listing_yields_modest_values():
@@ -89,8 +100,13 @@ def test_genuine_listing_yields_modest_values():
     # The reference is not inflated: it sits at the mean, so z ~ 0.
     assert abs(genuine["reference_price_z"]) < 1.0
     assert math.isclose(genuine["reference_price_z"], 0.0, abs_tol=1e-9)
-    # Discount is right at the category norm -> z ~ 0.
+    # Discount is right at the category norm -> z ~ 0. Unit-consistent: the 15%
+    # claimed discount (0.15 -> 15) matches the 15.0% category mean, so
+    # z = (15 - 15) / 10 = 0.0. The corrected formula keeps a genuine row's
+    # discount z at a sensible magnitude (|z| well under ~5), where the old
+    # fraction-vs-percentage mismatch produced a meaningless value.
     assert math.isclose(genuine["discount_vs_category_z"], 0.0, abs_tol=1e-9)
+    assert abs(genuine["discount_vs_category_z"]) < 5.0
 
 
 def test_inflated_dominates_genuine_on_key_signals():
@@ -112,7 +128,7 @@ def test_zero_std_stats_do_not_raise_and_zero_out_z_scores():
         "std_price": 0.0,
         "p25_price": 0.0,
         "p75_price": 0.0,
-        "mean_discount_pct": 0.15,
+        "mean_discount_pct": 15.0,  # percentage, matching ingestion stats
         "std_discount_pct": 0.0,
         "mean_rating": 0.0,
         "mean_rating_count": 0.0,
@@ -203,3 +219,113 @@ def test_dataframe_transform_matches_scalar(capsys):
             assert math.isclose(
                 frame.iloc[i][name], expected[name], rel_tol=1e-9, abs_tol=1e-12
             )
+
+
+# ---------------------------------------------------------------------------
+# Transparent weak-supervision labeling (Task 4.2, Req 2.3 / 10.1)
+# ---------------------------------------------------------------------------
+# These anchor the disclosed labeling heuristic in ``label_row`` / ``label_frame``:
+# a manufactured discount (an outlier "original" price with the selling price
+# still sitting at the category norm) is labeled ``inflated`` (0), while a real
+# markdown is labeled ``genuine`` (1).
+
+
+def test_label_row_flags_manufactured_discount_as_inflated():
+    """A huge outlier reference with the displayed price at the norm -> inflated (0)."""
+
+    label = label_row(
+        displayed_price=1000.0,  # sits right at the category mean (not a real markdown)
+        reference_price=5000.0,  # a fabricated "original" far above the category
+        category_stats=CATEGORY_STATS,
+    )
+
+    assert label == LABEL_INFLATED
+    assert label == 0
+
+
+def test_label_row_marks_modest_markdown_as_genuine():
+    """A modest markdown with a reference inside the normal band -> genuine (1)."""
+
+    label = label_row(
+        displayed_price=850.0,
+        reference_price=1000.0,  # reference at the category mean, not inflated
+        category_stats=CATEGORY_STATS,
+    )
+
+    assert label == LABEL_GENUINE
+    assert label == 1
+
+
+def test_label_row_treats_deep_real_markdown_as_genuine_despite_high_reference():
+    """A price genuinely far below the norm is genuine even if the reference is high.
+
+    The signature of a *manufactured* discount is that the discounted price still
+    sits near the norm; when the shopper actually pays well below the category
+    norm the markdown is real, so the row is genuine.
+    """
+
+    features = engineer_features(500.0, 5000.0, CATEGORY_STATS)
+    # Precondition: the displayed price is genuinely below the norm and the
+    # reference is an outlier above it.
+    assert features["displayed_price_z"] < -DISPLAYED_NORM_BAND_Z
+    assert features["reference_price_z"] >= REFERENCE_OUTLIER_Z
+
+    assert label_row(500.0, 5000.0, CATEGORY_STATS) == LABEL_GENUINE
+
+
+def test_label_row_degenerate_stats_default_to_genuine():
+    """With no category spread (std == 0) z-scores collapse to 0 -> genuine, not a raise."""
+
+    degenerate = {
+        "mean_price": 1000.0,
+        "median_price": 0.0,
+        "std_price": 0.0,
+        "p25_price": 0.0,
+        "p75_price": 0.0,
+        "mean_discount_pct": 15.0,
+        "std_discount_pct": 0.0,
+        "mean_rating": 0.0,
+        "mean_rating_count": 0.0,
+    }
+
+    assert label_row(1200.0, 6000.0, degenerate) == LABEL_GENUINE
+
+
+def test_label_frame_matches_label_row_per_row():
+    """The vectorized labeler reproduces ``label_row`` for every row and defaults genuine."""
+
+    import pandas as pd
+
+    df = pd.DataFrame(
+        [
+            {  # manufactured discount -> inflated (0)
+                "category": "electronics",
+                "displayed_price": 1000.0,
+                "reference_price": 5000.0,
+            },
+            {  # modest real markdown -> genuine (1)
+                "category": "electronics",
+                "displayed_price": 850.0,
+                "reference_price": 1000.0,
+            },
+            {  # deep real markdown, high reference -> genuine (1)
+                "category": "electronics",
+                "displayed_price": 500.0,
+                "reference_price": 5000.0,
+            },
+        ]
+    )
+    stats_by_category = {"electronics": CATEGORY_STATS}
+
+    labels = label_frame(df, stats_by_category)
+    print("LABELS:", list(labels))
+
+    assert list(labels) == [LABEL_INFLATED, LABEL_GENUINE, LABEL_GENUINE]
+    assert labels.name == "label"
+    assert list(labels.index) == list(df.index)
+
+    # Identical to the scalar rule, row by row.
+    for i, row in enumerate(df.itertuples(index=False)):
+        assert labels.iloc[i] == label_row(
+            row.displayed_price, row.reference_price, CATEGORY_STATS
+        )

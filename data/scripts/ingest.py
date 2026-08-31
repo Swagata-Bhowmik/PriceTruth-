@@ -1,10 +1,10 @@
 """Offline ingestion of the Kaggle / synthetic-fixture CSVs into the core tables.
 
-Tasks 3.2 and 3.3 of the ``price-truth-platform`` spec. This script loads the
-Amazon and Flipkart product CSVs, the cross-platform price CSV, and the curated
-pack-size-history CSV, cleans them, populates five of the six core tables
+Tasks 3.2, 3.3 and 3.4 of the ``price-truth-platform`` spec. This script loads
+the Amazon and Flipkart product CSVs, the cross-platform price CSV, and the
+curated pack-size-history CSV, cleans them, populates all six core tables
 through the SQLAlchemy models, and reduces the loaded snapshots into
-per-category price statistics:
+per-category price statistics and a per-category seasonal profile:
 
 * ``amazon_sample.csv`` + ``flipkart_sample.csv`` -> ``products`` + ``price_snapshots``
 * ``platform_prices.csv``                          -> ``platform_prices``
@@ -14,9 +14,12 @@ per-category price statistics:
   (task 3.3: mean/median/std/p25/p75 of the *displayed* price, the discount and
   rating norms, and the per-category sample size — the discount model's feature
   basis, Req 2.3)
+* each category -> ``category_seasonality`` (task 3.4: a twelve-month profile of
+  the ``relative_price_index`` with the deepest-discount window and the Indian
+  sale-calendar event per month, via ``app.ml.seasonality.build_category_profile``,
+  Req 6.2 / 6.5)
 
-It still leaves ``category_seasonality`` (task 3.4) to a separate step that reads
-the rows this script writes.
+A single ``ingest(...)`` therefore populates every core table.
 
 Cleaning rules (Req 9.5): currency symbols (``Rs``/``INR``/the rupee sign) and
 thousands separators are stripped from prices, ``%`` is stripped from discounts,
@@ -31,10 +34,10 @@ The CSV ``product_id`` is used verbatim as ``products.id`` (Req 17.1).
 
 The input directory defaults to the synthetic fixtures under
 ``data/raw/fixtures/`` and can be pointed at the real Kaggle download with
-``--path``. Ingestion is safe to re-run: the five populated tables (including
-``category_price_stats``) are cleared (children first, to respect the foreign
-keys onto ``products``) before the fresh rows are written, so re-running yields
-the same state rather than duplicates.
+``--path``. Ingestion is safe to re-run: the six populated tables (including
+``category_price_stats`` and ``category_seasonality``) are cleared (children
+first, to respect the foreign keys onto ``products``) before the fresh rows are
+written, so re-running yields the same state rather than duplicates.
 
 Usage::
 
@@ -90,11 +93,13 @@ PACK_SIZE_CANDIDATES = ("pack_size_history.csv",)
 # ``--database-url`` override has been applied (see ``_configure_database``).
 from app.db.models import (  # noqa: E402  (import after sys.path setup)
     CategoryPriceStats,
+    CategorySeasonality,
     PackSizeHistory,
     PlatformPrice,
     PriceSnapshot,
     Product,
 )
+from app.ml.seasonality import build_category_profile  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -264,6 +269,7 @@ class IngestCounts:
     platform_prices: int = 0
     pack_size_history: int = 0
     category_price_stats: int = 0
+    category_seasonality: int = 0
     # Diagnostics: rows skipped during cleaning.
     dropped_amazon: int = 0
     dropped_flipkart: int = 0
@@ -631,16 +637,53 @@ def _stat_summary(row: CategoryPriceStats) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Category seasonality (Req 6.2 / 6.5 / task 3.4)
+# ---------------------------------------------------------------------------
+def _compute_category_seasonality(
+    categories: list[str],
+) -> list[CategorySeasonality]:
+    """Build a twelve-month seasonal profile per category (task 3.4, Req 6.2/6.5).
+
+    Delegates the profile shape to :func:`app.ml.seasonality.build_category_profile`,
+    the single source of the seasonality logic, and persists one
+    ``category_seasonality`` row per (category, month).
+
+    The public fixtures carry no dated price series — every ``price_snapshots``
+    row has ``captured_at = None`` — so there is no per-category *monthly* price
+    signal to fit a seasonal curve to. ``build_category_profile`` is therefore
+    called *without* a ``monthly_signal``, which makes it fall back to the
+    documented Indian sale-calendar prior (Req 6.5): every sale month carries its
+    named ``sale_event`` and October (Big Billion Days) — the deepest festive
+    discount — is the single ``is_best_window`` month (Req 6.2). The profile is
+    identical across categories (same prior), but a full twelve-row profile is
+    written for *each* category so the Buy Timing Signal can read a seasonal
+    profile for any category that has price statistics.
+
+    ``categories`` is expected pre-sorted (it comes from the category-sorted
+    stats rows); rows are emitted category-by-category, month 1..12 within each,
+    for deterministic output. Each :class:`~app.ml.seasonality.MonthlySeasonPoint`
+    maps 1:1 onto the model columns, so a point is splatted straight into the row
+    (``CategorySeasonality(category=category, **point)``).
+    """
+
+    rows: list[CategorySeasonality] = []
+    for category in categories:
+        for point in build_category_profile():
+            rows.append(CategorySeasonality(category=category, **point))
+    return rows
+
+
+# ---------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------
 def _clear_core_tables(session) -> None:
-    """Delete the five populated tables, children before parents (idempotency).
+    """Delete the six populated tables, children before parents (idempotency).
 
     ``price_snapshots``, ``platform_prices``, and ``pack_size_history`` all hold a
     foreign key onto ``products``, so they are emptied first. ``category_price_stats``
-    is keyed by category (not a real FK) and is cleared here too so task 3.3's
-    output is replaced on every run. ``category_seasonality`` is intentionally
-    left untouched (task 3.4).
+    and ``category_seasonality`` are keyed by category (not a real FK) and are
+    cleared here too so task 3.3's and task 3.4's output is replaced on every
+    run rather than accumulating duplicates.
     """
 
     from sqlalchemy import delete
@@ -650,6 +693,7 @@ def _clear_core_tables(session) -> None:
     session.execute(delete(PackSizeHistory))
     session.execute(delete(Product))
     session.execute(delete(CategoryPriceStats))
+    session.execute(delete(CategorySeasonality))
     session.commit()
 
 
@@ -693,6 +737,17 @@ def run_ingestion(directory: Path, session) -> IngestCounts:
     counts.category_stats = [_stat_summary(row) for row in category_stats]
     session.add_all(category_stats)
 
+    # Build a twelve-month seasonal profile for every category that has price
+    # stats and persist it in the same transaction (task 3.4, Req 6.2/6.5). The
+    # category set is taken from the freshly computed stats rows (already sorted
+    # by category) so seasonality and stats always cover exactly the same
+    # categories. See _compute_category_seasonality for why no monthly signal is
+    # passed (the fixtures carry no dated series -> sale-calendar prior).
+    seasonality_rows = _compute_category_seasonality(
+        [row.category for row in category_stats]
+    )
+    session.add_all(seasonality_rows)
+
     session.commit()
 
     counts.products = len(products)
@@ -700,6 +755,7 @@ def run_ingestion(directory: Path, session) -> IngestCounts:
     counts.platform_prices = len(platform_prices)
     counts.pack_size_history = len(pack_rows)
     counts.category_price_stats = len(category_stats)
+    counts.category_seasonality = len(seasonality_rows)
     counts.categories = sorted({p.category for p in products.values() if p.category})
     return counts
 
@@ -770,6 +826,7 @@ def _print_report(counts: IngestCounts, directory: Path) -> None:
     print(f"  platform_prices     : {counts.platform_prices}")
     print(f"  pack_size_history   : {counts.pack_size_history}")
     print(f"  category_price_stats: {counts.category_price_stats}")
+    print(f"  category_seasonality: {counts.category_seasonality}")
     print("-" * 60)
     print("Normalized categories:")
     for slug in counts.categories:
