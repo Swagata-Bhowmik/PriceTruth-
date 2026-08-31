@@ -9,6 +9,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 from sqlalchemy.exc import OperationalError
 
 from app.api.v1 import (
@@ -21,6 +25,7 @@ from app.api.v1 import (
     shrinkflation,
     unit_price,
 )
+from app.core.config import get_settings
 from app.core.errors import AppError, ErrorPayload
 from app.core.logging import get_logger
 from app.ml.discount_model import get_model
@@ -97,10 +102,86 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS Configuration
+# ---------------------------------------------------------------------------
+# Security middleware: request rate limiting (Req 18.4) and CORS (Req 18.3)
+#
+# Rate limiting (Task 14.1, Req 18.4)
+# -----------------------------------
+# A ``slowapi`` limiter keyed by the client's remote address enforces a default
+# per-client limit (``RATE_LIMIT``, default 60/minute). ``SlowAPIMiddleware``
+# applies that default to every route; a client that exceeds it gets the
+# structured 429 payload rendered by ``rate_limit_exceeded_handler`` below,
+# which reuses ``ErrorPayload`` so a throttled request shares the single error
+# contract every other failure uses (Req 15.3). The limiter is stashed on
+# ``app.state`` because the middleware reads it from there per request.
+#
+# The limiter's ``enabled`` flag is wired to ``RATE_LIMIT_ENABLED`` so it can be
+# switched off from the environment. When disabled the middleware is fully
+# transparent (it just forwards the request), which is how the general test
+# suite - a single client issuing far more than 60 requests/minute - runs
+# unaffected.
+#
+# CORS (Task 14.2, Req 18.3)
+# --------------------------
+# Cross-origin requests are restricted to the single configured frontend origin
+# (``CORS_ALLOWED_ORIGIN``) instead of the previous permissive ``"*"``. CORS is
+# added last so it is the outermost middleware and therefore annotates every
+# response - including a 429 from the rate limiter - with the appropriate
+# cross-origin headers.
+#
+# Input validation (Req 18.1) needs no wiring here: every endpoint already
+# validates its inputs at the Pydantic boundary (path/query/body models), so
+# malformed input is rejected as a structured 422 before any handler runs.
+# ---------------------------------------------------------------------------
+
+_settings = get_settings()
+
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[_settings.RATE_LIMIT],
+    enabled=_settings.RATE_LIMIT_ENABLED,
+)
+# The SlowAPI middleware resolves the limiter from ``app.state`` on each request.
+app.state.limiter = limiter
+
+
+def rate_limit_exceeded_handler(
+    request: Request, exc: RateLimitExceeded
+) -> JSONResponse:
+    """Render a rate-limit breach as the structured 429 payload (Req 18.4, 15.3).
+
+    Reuses :class:`~app.core.errors.ErrorPayload` so a throttled request returns
+    the same ``{"error": {code, message, status, details}}`` shape as every
+    other error, with a stable ``RATE_LIMIT_EXCEEDED`` code and HTTP 429.
+
+    Defined as a synchronous function on purpose: ``SlowAPIMiddleware`` invokes
+    the registered handler directly on its synchronous check path and falls back
+    to slowapi's default handler for a coroutine, so a sync handler is required
+    for this structured payload to actually be returned.
+    """
+
+    payload = ErrorPayload.build(
+        code="RATE_LIMIT_EXCEEDED",
+        message=(
+            "Rate limit exceeded. Please slow down and try again in a little "
+            "while."
+        ),
+        status=429,
+        details={"limit": str(exc.limit.limit)},
+    )
+    return JSONResponse(status_code=payload.error.status, content=payload.model_dump())
+
+
+# Added first -> innermost: the limit is checked just before the route runs.
+app.add_middleware(SlowAPIMiddleware)
+# Translate a limiter breach into the structured payload (Req 15.3, 18.4).
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+
+# CORS: restrict cross-origin requests to the single configured frontend origin
+# (Req 18.3). Added last -> outermost, so it annotates every response.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=[_settings.CORS_ALLOWED_ORIGIN],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -47,6 +47,15 @@ class Settings(BaseSettings):
     # The single frontend origin permitted to make cross-origin requests.
     CORS_ALLOWED_ORIGIN: str = "http://localhost:5173"
 
+    # Request rate limiting (Req 18.4). ``RATE_LIMIT`` is a slowapi limit string
+    # ("<count>/<period>") enforced per client (keyed by remote address); the
+    # default rejects a client that exceeds 60 requests per minute with a 429.
+    # ``RATE_LIMIT_ENABLED`` gates the limiter so it can be turned off from the
+    # environment (e.g. in the test suite, where a single client issues far more
+    # than 60 requests/minute) without touching code.
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT: str = "60/minute"
+
 
 @lru_cache
 def get_settings() -> Settings:

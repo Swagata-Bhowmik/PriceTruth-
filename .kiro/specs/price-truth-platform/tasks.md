@@ -110,7 +110,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Verify feature values on known inputs, labeling on synthetic outliers, and that the model/explainer are instantiated once and reused
     - _Requirements: 2.3, 3.4, 12.4_
 
-- [ ] 5. Checkpoint - backend foundation
+- [x] 5. Checkpoint - backend foundation
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 6. Unit Price Comparator service and endpoint
@@ -259,20 +259,20 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add `GET /api/v1/data-sources` in `app/api/v1/meta.py` describing data sources and known limitations, the crowd-sourced OFF notice, the category-level/snapshot disclosure, and the statement that live Amazon/Flipkart scraping is not a core data source
     - _Requirements: 10.2, 10.3, 10.4_
 
-  - [x]* 13.3 Write unit/API tests for containment and disclosure
+  - [ ]* 13.3 Write unit/API tests for containment and disclosure
     - Verify a thrown module error is contained (others still return) and the data-sources payload contains all required disclosures
     - _Requirements: 8.5, 10.2, 10.4, 15.1_
 
-- [ ] 14. Security hardening (cross-cutting)
-  - [ ] 14.1 Add request rate limiting
+- [x] 14. Security hardening (cross-cutting)
+  - [x] 14.1 Add request rate limiting
     - Wire a `slowapi` limiter into `main.py` enforcing 60 requests/min/client, returning a 429 rate-limit status on excess
     - _Requirements: 18.4_
 
-  - [ ] 14.2 Tighten CORS and confirm boundary input validation
+  - [x] 14.2 Tighten CORS and confirm boundary input validation
     - Change `main.py` CORS from `allow_origins=["*"]` to the single configured frontend origin from settings; confirm every endpoint validates input type/length/format at the Pydantic boundary
     - _Requirements: 18.1, 18.3_
 
-  - [ ]* 14.3 Write API tests for security controls
+  - [x]* 14.3 Write API tests for security controls
     - Cover rate-limit trigger at 61 req/min, allowed vs disallowed CORS origin, injection strings treated as data (parameterized queries), and absence of secrets in responses
     - _Requirements: 18.2, 18.3, 18.4, 18.6_
 
