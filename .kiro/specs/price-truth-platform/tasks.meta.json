@@ -15,6 +15,14 @@
     "10.2 Write property tests for the cross-platform aggregator": {
       "status": "passed",
       "lastRunTimestamp": 1788190146200
+    },
+    "8.2 Write property tests for discount scoring, bands, identity, and pre-conditions": {
+      "status": "passed",
+      "lastRunTimestamp": 1788197940901
+    },
+    "8.4 Write property tests for the SHAP breakdown": {
+      "status": "passed",
+      "lastRunTimestamp": 1788197997885
     }
   },
   "executionHistory": {
@@ -349,6 +357,11 @@
         "executionId": "1dc81b33-1daf-4f0b-b3bc-c64fdd354081",
         "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
         "timestamp": 1788109477803
+      },
+      {
+        "executionId": "d1085a7c-59ed-459d-9ddb-f55ecd0fdbb0",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788198598027
       }
     ],
     "9.1 Implement the shrinkflation service": [
@@ -754,6 +767,39 @@
         "executionId": "0172cc0b-c343-4d9f-b8c8-f920d407f1f5",
         "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
         "timestamp": 1788197424160
+      }
+    ],
+    "8.2 Write property tests for discount scoring, bands, identity, and pre-conditions": [
+      {
+        "executionId": "d1085a7c-59ed-459d-9ddb-f55ecd0fdbb0",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788198597169
+      }
+    ],
+    "8. True Discount Checker and SHAP explainability": [
+      {
+        "executionId": "d1085a7c-59ed-459d-9ddb-f55ecd0fdbb0",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788198598242
+      },
+      {
+        "executionId": "d1085a7c-59ed-459d-9ddb-f55ecd0fdbb0",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788198598649
+      }
+    ],
+    "8.4 Write property tests for the SHAP breakdown": [
+      {
+        "executionId": "d1085a7c-59ed-459d-9ddb-f55ecd0fdbb0",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788198598351
+      }
+    ],
+    "8.5 Write unit/API tests for limited verification and not-evaluable paths": [
+      {
+        "executionId": "d1085a7c-59ed-459d-9ddb-f55ecd0fdbb0",
+        "chatSessionId": "sess_273eebea-42bb-4001-8e52-e0c91a97780e",
+        "timestamp": 1788198599208
       }
     ]
   }

@@ -156,29 +156,29 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Cover timeout to retry (<=2) to data-unavailable, cache-hit-on-failure, and data-unavailable propagation to a consuming module
     - _Requirements: 9.2, 9.3, 15.2_
 
-- [ ] 8. True Discount Checker and SHAP explainability
+- [x] 8. True Discount Checker and SHAP explainability
   - [x] 8.1 Implement the discount scoring and banding service
     - In `app/services/discount_service.py`, read `category_price_stats`, engineer features, call inference, map `p(genuine)` to `genuineness_score = round(p*100)` in [0,100], assign bands (>=90 genuine, 60-89 moderate, <60 likely_inflated), and compute effective discount pct
     - Handle pre-conditions: missing/<=displayed reference to not-evaluable with reason; missing category stats to limited-verification result with price context and no score
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-  - [ ]* 8.2 Write property tests for discount scoring, bands, identity, and pre-conditions
+  - [x]* 8.2 Write property tests for discount scoring, bands, identity, and pre-conditions
     - **Property 2: Genuineness score is always within range** - _Validates: Requirements 2.1_
     - **Property 3: Discount band is a correct total function of the score** - _Validates: Requirements 2.2_
     - **Property 4: Effective discount percentage identity** - _Validates: Requirements 2.4_
     - **Property 5: A discount cannot be evaluated without a valid reference** - _Validates: Requirements 2.5_
 
-  - [ ] 8.3 Implement the discount-check endpoint with the SHAP breakdown
+  - [x] 8.3 Implement the discount-check endpoint with the SHAP breakdown
     - Add `POST /api/v1/discount-check` in `app/api/v1/discount.py` returning displayed/reference price, effective discount, score, classification, and the SHAP `explanation` (base value, final score, plain-language contributions with direction); register the router
     - Cache under `discount:{category}:{displayed}:{reference}`
     - _Requirements: 2.4, 3.1, 3.2, 3.3, 3.5, 11.3, 18.1_
 
-  - [ ]* 8.4 Write property tests for the SHAP breakdown
+  - [x]* 8.4 Write property tests for the SHAP breakdown
     - **Property 6: SHAP breakdown is complete and plainly labelled** - _Validates: Requirements 3.1, 3.5_
     - **Property 7: SHAP contribution direction matches its sign** - _Validates: Requirements 3.2_
     - **Property 8: SHAP contributions reconcile to the result** - _Validates: Requirements 3.3_
 
-  - [ ]* 8.5 Write unit/API tests for limited verification and not-evaluable paths
+  - [x]* 8.5 Write unit/API tests for limited verification and not-evaluable paths
     - Cover the 200 limited-verification body (stats missing), the 422 not-evaluable body (bad reference), and boundary scores 59/60/89/90
     - _Requirements: 2.2, 2.5, 2.6_
 
@@ -255,7 +255,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add `GET /api/v1/dashboard/{product_id}` in `app/api/v1/dashboard.py` that calls each feature service independently, wrapping each in try/except so one failing module returns its unavailable payload while the others succeed; register the router
     - _Requirements: 8.1, 8.5, 15.1_
 
-  - [x] 13.2 Implement the data-sources disclosure endpoint
+  - [ ] 13.2 Implement the data-sources disclosure endpoint
     - Add `GET /api/v1/data-sources` in `app/api/v1/meta.py` describing data sources and known limitations, the crowd-sourced OFF notice, the category-level/snapshot disclosure, and the statement that live Amazon/Flipkart scraping is not a core data source
     - _Requirements: 10.2, 10.3, 10.4_
 
