@@ -62,12 +62,12 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add small synthetic CSVs under `data/raw/fixtures/` matching the Kaggle Amazon/Flipkart schema (price, reference price, discount, rating, rating count, category, pack quantity) plus a few curated `pack_size_history` rows, so the whole pipeline runs without the real download
     - _Requirements: 17.1_
 
-  - [x] 3.2 Implement CSV load and cleaning into core tables
+  - [ ] 3.2 Implement CSV load and cleaning into core tables
     - Create `data/scripts/ingest.py` that loads CSVs (pandas), strips currency symbols/thousands separators, coerces numeric fields, drops non-positive prices, clamps discount pct to [0,100], normalizes category labels, and populates `products`, `price_snapshots`, and `platform_prices`
     - Default the input path to the synthetic fixtures; accept a path argument for real data
     - _Requirements: 9.5, 17.1_
 
-  - [ ] 3.3 Compute and persist category price statistics
+  - [x] 3.3 Compute and persist category price statistics
     - Extend ingestion to reduce ingested rows into per-category distribution stats (mean/median/std/p25/p75 price, mean/std discount pct, rating norms, sample size) and populate `category_price_stats`
     - _Requirements: 2.3_
 
@@ -85,7 +85,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 2.3, 9.5_
 
 - [ ] 4. Machine learning pipeline
-  - [ ] 4.1 Implement snapshot-aware feature engineering
+  - [x] 4.1 Implement snapshot-aware feature engineering
     - In `app/ml/discount_model.py`, implement the feature transform from `(displayed_price, reference_price, category_stats)` into the documented features (`claimed_discount_pct`, `discount_vs_category_z`, `displayed_price_z`, `reference_price_z`, `displayed_vs_median`, `reference_vs_p75`, and review-signal features)
     - _Requirements: 2.3_
 
@@ -113,7 +113,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
 - [ ] 5. Checkpoint - backend foundation
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Unit Price Comparator service and endpoint
+- [x] 6. Unit Price Comparator service and endpoint
   - [x] 6.1 Implement the unit price comparator service
     - In `app/services/unit_price_service.py`, convert each variant's pack quantity to a common standard unit (g/ml; kg to g and l to ml multiply by 1000), compute unit price = price / standardized quantity, mark the lowest as best value, and exclude variants with missing/non-positive quantity into an `excluded` list with a reason
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
@@ -124,7 +124,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 14: Unit-price comparison is invariant to unit scale** - _Validates: Requirements 5.4_
     - **Property 15: Invalid-quantity variants are excluded, valid ones included once** - _Validates: Requirements 5.5_
 
-  - [ ] 6.3 Implement the unit-price compare endpoint and schemas
+  - [x] 6.3 Implement the unit-price compare endpoint and schemas
     - Add `POST /api/v1/unit-price/compare` in `app/api/v1/unit_price.py` with the `VariantIn` Pydantic model (unit pattern `^(g|kg|ml|l)$`); register the router in `main.py`
     - _Requirements: 5.3, 14.4, 18.1_
 
@@ -132,7 +132,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Cover the example from the design, mixed-unit conversion, and the excluded-variant response shape
     - _Requirements: 5.3, 5.5, 15.3_
 
-- [ ] 7. Data Service (Open Food Facts client, caching, validation)
+- [x] 7. Data Service (Open Food Facts client, caching, validation)
   - [x] 7.1 Implement the OFF client with timeout and bounded retries
     - In `app/services/data_service.py`, call `GET {OFF_BASE_URL}/api/{OFF_VERSION}/product/{barcode}.json` via `httpx.AsyncClient` with a custom `User-Agent`, a 5-second timeout, and at most 2 retries before returning a data-unavailable status
     - _Requirements: 9.2, 15.2_
@@ -141,7 +141,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Cache validated OFF products under `off:product:{barcode}` (24h) and add cache get/set for the other documented keys; on OFF failure return a cached value when a cache hit exists, else data-unavailable
     - _Requirements: 9.2, 9.4, 12.3_
 
-  - [ ] 7.3 Implement external-value validation and missing-field handling
+  - [x] 7.3 Implement external-value validation and missing-field handling
     - Validate every returned value against expected type/range before it reaches a feature module; return present fields and mark missing fields unavailable rather than failing; log rejections
     - Flag OFF-derived results as crowd-sourced/possibly incomplete
     - _Requirements: 9.1, 9.5, 10.3, 15.4, 18.1_
@@ -187,7 +187,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - In `app/services/shrinkflation_service.py`, read `pack_size_history`, return points in chronological order with pack quantity, selling price, computed unit price, and source attribution; compute total percentage change in pack quantity and in unit price when >=2 points exist; return an unavailable message when there is no history
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [ ]* 9.2 Write property tests for the shrinkflation timeline
+  - [x]* 9.2 Write property tests for the shrinkflation timeline
     - **Property 9: Shrinkflation timeline is ordered and attributed** - _Validates: Requirements 4.1, 4.4_
     - **Property 10: Unit price identity at each timeline point** - _Validates: Requirements 4.2_
     - **Property 11: Total pack-size and unit-price change identity** - _Validates: Requirements 4.3_

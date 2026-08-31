@@ -41,6 +41,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import math
 from typing import Any, Callable, Optional, TypedDict
 from urllib.parse import quote
 
@@ -53,6 +54,8 @@ from app.db.redis_client import cache_get, cache_set
 __all__ = [
     "fetch_off_product",
     "get_off_product_cached",
+    "get_validated_off_product",
+    "validate_off_product",
     "cached_or_compute",
     "cache_get_json",
     "cache_set_json",
@@ -80,6 +83,8 @@ __all__ = [
     "REASON_UNEXPECTED_STATUS",
     "REASON_INVALID_RESPONSE",
     "REASON_INVALID_BARCODE",
+    "SOURCE_OPEN_FOOD_FACTS",
+    "OFF_PRODUCT_FIELDS",
 ]
 
 logger = get_logger(__name__)
@@ -581,9 +586,12 @@ async def get_off_product_cached(
     result = await fetch_off_product(barcode_str, transport=transport, **fetch_kwargs)
 
     if result["status"] == STATUS_OK:
-        # Store the product payload for 24h. Task 7.3 will validate/shape the
-        # payload before this cache write; the transport result is used as-is
-        # for now.
+        # Store the raw OFF product payload for 24h. Validation/shaping (Task
+        # 7.3) is applied on the *read* path by :func:`get_validated_off_product`
+        # / :func:`validate_off_product` rather than before this write, so the
+        # cache keeps a faithful, deterministic copy of the source payload
+        # (Property 21) while feature modules always receive type/range-checked,
+        # crowd-sourced-flagged data (Req 9.1, 9.5, 10.3, 15.4, 18.1).
         cache_set_json(key, result["product"], ttl_seconds)
         return result
 
@@ -596,4 +604,249 @@ async def get_off_product_cached(
         )
         return ok_result(cached)
 
+    return result
+
+
+# ===========================================================================
+# Task 7.3 - External-value validation and missing-field handling
+# ===========================================================================
+#
+# Open Food Facts is a *crowd-sourced* database: any given product may be
+# missing fields, or carry values of the wrong type or an impossible range.
+# This section turns a raw OFF product payload into a small, predictable shape
+# that feature modules can consume safely:
+#
+#   * every field the platform uses is either a present, type/range-valid value
+#     or ``None`` with its name listed in ``unavailable_fields`` (Req 9.1) - a
+#     missing field degrades gracefully instead of raising;
+#   * a present value that fails type/range validation is rejected (dropped to
+#     unavailable) and the rejection is recorded in the application log
+#     (Req 9.5, 15.4, 18.1) so bad external data never silently reaches a
+#     feature module;
+#   * the result is flagged as crowd-sourced / possibly incomplete (Req 10.3).
+#
+# Validation is applied on the *read* path (see :func:`get_validated_off_product`)
+# so the Task 7.2 cache keeps a faithful copy of the source payload while every
+# consumer receives the shaped, validated view. Design references: Property 20
+# (missing fields degrade gracefully), Property 22 (values validated before
+# use), Property 24 (crowd-sourced disclosure), and the Error Categories table.
+
+#: Origin marker attached to every shaped OFF product so downstream layers can
+#: disclose that the data is crowd-sourced and may be incomplete (Req 10.3).
+SOURCE_OPEN_FOOD_FACTS = "open_food_facts"
+
+#: Canonical field names the platform consumes from an OFF product, in output
+#: order. Kept as a module constant so tests and callers can refer to it.
+OFF_PRODUCT_FIELDS = ("product_name", "brands", "quantity", "categories")
+
+#: Upper bound on a plausible pack quantity (in the value's own unit) used to
+#: reject absurd/garbage magnitudes while remaining generous for real packs.
+_MAX_QUANTITY = 1e6
+
+
+def _truncate_for_log(value: Any, limit: int = 120) -> str:
+    """Return a short, safe ``repr`` of a rejected value for structured logs.
+
+    The offending value is only summarised (type + truncated repr) so a large
+    or awkward payload never bloats a log line.
+    """
+
+    text = repr(value)
+    return text if len(text) <= limit else text[:limit] + "..."
+
+
+def _validate_text(value: Any) -> tuple[bool, Optional[str]]:
+    """Validate a free-text field (product name, brand).
+
+    Accepts a non-empty string (after stripping surrounding whitespace) and
+    returns the cleaned value. Anything else - a non-string type or a
+    blank/whitespace-only string - fails validation.
+    """
+
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if cleaned:
+            return True, cleaned
+    return False, None
+
+
+def _validate_categories(value: Any) -> tuple[bool, Optional[str]]:
+    """Validate the category field, accepting OFF's string or list encodings.
+
+    OFF exposes categories either as a comma-separated string (``categories``)
+    or, in some payloads, as a list of tag strings. A non-empty string is used
+    as-is; a list is reduced to its non-empty string members joined with
+    ``", "``. Empty or otherwise-typed values fail validation.
+    """
+
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if cleaned:
+            return True, cleaned
+        return False, None
+    if isinstance(value, (list, tuple)):
+        parts = [item.strip() for item in value if isinstance(item, str) and item.strip()]
+        if parts:
+            return True, ", ".join(parts)
+    return False, None
+
+
+def _validate_quantity(value: Any) -> tuple[bool, Optional[float]]:
+    """Validate a pack quantity as a positive, finite number.
+
+    Accepts an ``int``/``float`` directly, or a string that parses cleanly to a
+    number (so OFF's numeric ``product_quantity`` string is usable). Rejects
+    booleans, non-finite values (NaN/inf), non-positive magnitudes, absurd
+    magnitudes, unit-bearing strings such as ``"750 g"``, and pure garbage such
+    as ``"abc"``. The accepted value is normalised to ``float``.
+    """
+
+    # ``bool`` is a subclass of ``int``; a True/False must never read as 1/0.
+    if isinstance(value, bool):
+        return False, None
+
+    if isinstance(value, (int, float)):
+        number = float(value)
+    elif isinstance(value, str):
+        try:
+            number = float(value.strip())
+        except (ValueError, TypeError):
+            return False, None
+    else:
+        return False, None
+
+    if not math.isfinite(number) or number <= 0 or number > _MAX_QUANTITY:
+        return False, None
+    return True, number
+
+
+#: Maps each canonical output field to (candidate OFF payload keys, validator).
+#: Candidate keys are probed in order and the first *valid* one wins, so a field
+#: with a bad primary encoding can still recover from an alternate key.
+_FIELD_SPECS: tuple[tuple[str, tuple[str, ...], Callable[[Any], tuple[bool, Any]]], ...] = (
+    ("product_name", ("product_name",), _validate_text),
+    ("brands", ("brands",), _validate_text),
+    ("quantity", ("quantity", "product_quantity"), _validate_quantity),
+    ("categories", ("categories", "category"), _validate_categories),
+)
+
+
+def validate_off_product(raw: Any) -> dict:
+    """Validate and shape a raw OFF product payload for feature modules.
+
+    For each field the platform uses (:data:`OFF_PRODUCT_FIELDS`) this:
+
+    * returns the present, type/range-valid value (Req 9.1);
+    * marks a field ``None`` and lists it in ``unavailable_fields`` when it is
+      absent - a missing field degrades gracefully rather than failing
+      (Req 9.1);
+    * rejects a present-but-invalid value (wrong type or out of range),
+      dropping it to unavailable and recording the rejection in the application
+      log (Req 9.5, 15.4, 18.1); and
+    * flags the whole result as crowd-sourced/possibly incomplete via
+      ``source`` and ``crowd_sourced`` (Req 10.3).
+
+    The function never raises for a malformed payload: a non-mapping input is
+    treated as an empty product (all fields unavailable) so callers can rely on
+    a stable shape.
+
+    Args:
+        raw: The raw OFF product payload (normally a ``dict``).
+
+    Returns:
+        A dict with each field in :data:`OFF_PRODUCT_FIELDS` (value or ``None``),
+        an ``unavailable_fields`` list, ``source`` set to
+        :data:`SOURCE_OPEN_FOOD_FACTS`, and ``crowd_sourced`` set to ``True``.
+    """
+
+    if isinstance(raw, dict):
+        raw_dict = raw
+    else:
+        # Defensive: an unexpected payload shape is not a crash, it is simply a
+        # product with no usable fields.
+        logger.warning(
+            "off_product_not_a_mapping",
+            extra={"payload_type": type(raw).__name__},
+        )
+        raw_dict = {}
+
+    shaped: dict[str, Any] = {}
+    unavailable: list[str] = []
+
+    for field, source_keys, validator in _FIELD_SPECS:
+        present = False
+        rejected_key: Optional[str] = None
+        rejected_value: Any = None
+        accepted_value: Any = None
+        accepted = False
+
+        for key in source_keys:
+            if key not in raw_dict or raw_dict[key] is None:
+                continue
+            present = True
+            ok, cleaned = validator(raw_dict[key])
+            if ok:
+                accepted = True
+                accepted_value = cleaned
+                break
+            if rejected_key is None:
+                rejected_key = key
+                rejected_value = raw_dict[key]
+
+        if accepted:
+            shaped[field] = accepted_value
+        elif not present:
+            # Field entirely absent: unavailable, not an error (Req 9.1).
+            shaped[field] = None
+            unavailable.append(field)
+            logger.debug("off_field_missing", extra={"field": field})
+        else:
+            # Present but every candidate failed type/range validation: reject
+            # the value and record it in the log (Req 9.5, 15.4, 18.1).
+            shaped[field] = None
+            unavailable.append(field)
+            logger.warning(
+                "off_field_rejected",
+                extra={
+                    "field": field,
+                    "source_key": rejected_key,
+                    "value_type": type(rejected_value).__name__,
+                    "value": _truncate_for_log(rejected_value),
+                    "reason": "failed_type_or_range_validation",
+                },
+            )
+
+    shaped["unavailable_fields"] = unavailable
+    shaped["source"] = SOURCE_OPEN_FOOD_FACTS
+    shaped["crowd_sourced"] = True
+    return shaped
+
+
+async def get_validated_off_product(barcode: str, **kwargs: Any) -> OffResult:
+    """Cache-first OFF lookup that returns *validated, shaped* product data.
+
+    Thin read-path wrapper over :func:`get_off_product_cached`: it preserves all
+    of that function's caching and failure-fallback behaviour (Req 9.2, 9.4,
+    12.3) and, on a successful lookup, passes the raw payload through
+    :func:`validate_off_product` so the returned product carries only
+    type/range-valid fields, has missing/rejected fields marked unavailable
+    (Req 9.1, 9.5, 15.4, 18.1), and is flagged as crowd-sourced (Req 10.3). An
+    ``"unavailable"`` result is propagated unchanged.
+
+    The :class:`OffResult` shape is unchanged; only the ``product`` payload is
+    the shaped dict instead of the raw OFF JSON.
+
+    Args:
+        barcode: The product barcode to look up.
+        **kwargs: Forwarded verbatim to :func:`get_off_product_cached` (e.g.
+            ``force_refresh``, ``transport``, ``ttl_seconds``, ``timeout``).
+
+    Returns:
+        An :class:`OffResult` whose ``product`` is the validated/shaped payload
+        on success, or an unchanged data-unavailable result on failure.
+    """
+
+    result = await get_off_product_cached(barcode, **kwargs)
+    if result["status"] == STATUS_OK:
+        return ok_result(validate_off_product(result["product"]))
     return result

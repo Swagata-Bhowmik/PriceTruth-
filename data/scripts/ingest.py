@@ -1,18 +1,22 @@
 """Offline ingestion of the Kaggle / synthetic-fixture CSVs into the core tables.
 
-Task 3.2 of the ``price-truth-platform`` spec. This script loads the Amazon and
-Flipkart product CSVs, the cross-platform price CSV, and the curated
-pack-size-history CSV, cleans them, and populates four of the six core tables
-through the SQLAlchemy models:
+Tasks 3.2 and 3.3 of the ``price-truth-platform`` spec. This script loads the
+Amazon and Flipkart product CSVs, the cross-platform price CSV, and the curated
+pack-size-history CSV, cleans them, populates five of the six core tables
+through the SQLAlchemy models, and reduces the loaded snapshots into
+per-category price statistics:
 
 * ``amazon_sample.csv`` + ``flipkart_sample.csv`` -> ``products`` + ``price_snapshots``
 * ``platform_prices.csv``                          -> ``platform_prices``
 * ``pack_size_history.csv``                        -> ``pack_size_history``
   (``unit_price = selling_price / pack_quantity`` is computed per row)
+* the loaded ``price_snapshots`` grouped by category -> ``category_price_stats``
+  (task 3.3: mean/median/std/p25/p75 of the *displayed* price, the discount and
+  rating norms, and the per-category sample size — the discount model's feature
+  basis, Req 2.3)
 
-It deliberately does **not** compute ``category_price_stats`` (task 3.3) or
-``category_seasonality`` (task 3.4); those are separate tasks that read the rows
-this script writes.
+It still leaves ``category_seasonality`` (task 3.4) to a separate step that reads
+the rows this script writes.
 
 Cleaning rules (Req 9.5): currency symbols (``Rs``/``INR``/the rupee sign) and
 thousands separators are stripped from prices, ``%`` is stripped from discounts,
@@ -27,9 +31,10 @@ The CSV ``product_id`` is used verbatim as ``products.id`` (Req 17.1).
 
 The input directory defaults to the synthetic fixtures under
 ``data/raw/fixtures/`` and can be pointed at the real Kaggle download with
-``--path``. Ingestion is safe to re-run: the four populated tables are cleared
-(children first, to respect the foreign keys onto ``products``) before the fresh
-rows are written, so re-running yields the same state rather than duplicates.
+``--path``. Ingestion is safe to re-run: the five populated tables (including
+``category_price_stats``) are cleared (children first, to respect the foreign
+keys onto ``products``) before the fresh rows are written, so re-running yields
+the same state rather than duplicates.
 
 Usage::
 
@@ -45,6 +50,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
 import sys
@@ -83,6 +89,7 @@ PACK_SIZE_CANDIDATES = ("pack_size_history.csv",)
 # lazily when app.db.session is imported, which is deferred until after any
 # ``--database-url`` override has been applied (see ``_configure_database``).
 from app.db.models import (  # noqa: E402  (import after sys.path setup)
+    CategoryPriceStats,
     PackSizeHistory,
     PlatformPrice,
     PriceSnapshot,
@@ -256,6 +263,7 @@ class IngestCounts:
     price_snapshots: int = 0
     platform_prices: int = 0
     pack_size_history: int = 0
+    category_price_stats: int = 0
     # Diagnostics: rows skipped during cleaning.
     dropped_amazon: int = 0
     dropped_flipkart: int = 0
@@ -265,6 +273,8 @@ class IngestCounts:
     orphan_platform: int = 0
     orphan_pack: int = 0
     categories: list[str] = field(default_factory=list)
+    # Per-category statistic summaries (plain dicts) captured for the report.
+    category_stats: list[dict] = field(default_factory=list)
 
 
 def _resolve_file(directory: Path, *candidates: str) -> Optional[Path]:
@@ -504,14 +514,133 @@ def _load_pack_size_history(
 
 
 # ---------------------------------------------------------------------------
+# Category price statistics (Req 2.3 / task 3.3)
+# ---------------------------------------------------------------------------
+def _finite(value: object) -> float:
+    """Coerce a computed statistic to a real, finite float.
+
+    pandas returns ``NaN`` for statistics that are undefined on the sample (for
+    example the sample standard deviation of a single row, or the mean of an
+    all-missing column). Those columns are non-nullable floats in the schema and
+    a ``NaN`` would silently poison the downstream z-score features, so any
+    ``NaN``/``inf`` is normalised to ``0.0``.
+    """
+
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    return number if math.isfinite(number) else 0.0
+
+
+def _compute_category_stats(
+    products: dict[str, Product],
+    snapshots: list[PriceSnapshot],
+) -> list[CategoryPriceStats]:
+    """Reduce the loaded snapshots into one statistics row per category (Req 2.3).
+
+    Every :class:`PriceSnapshot` is grouped by its product's canonical category
+    slug, and each group is summarised into the distribution features the
+    discount model consumes:
+
+    * price location / spread — ``mean``/``median``/``std``/``p25``/``p75`` of the
+      **displayed (discounted) price**. The shopper-facing price is used because
+      the model normalises it against the category distribution
+      (``displayed_price_z``, ``displayed_vs_median``) and flags an inflated
+      reference relative to the same spread (``reference_price_z``,
+      ``reference_vs_p75``).
+    * discount norm — ``mean``/``std`` of ``discount_pct``.
+    * review norms — ``mean_rating`` and ``mean_rating_count``.
+    * ``sample_size`` — the number of snapshot rows in the category.
+
+    Standard deviations use the sample estimator (``ddof=1``), the pandas default
+    and the unbiased choice for a sample drawn from a category. Missing discount
+    or review values are dropped per-column (rather than dropping the whole
+    snapshot) so a snapshot still contributes its price, and every emitted value
+    is passed through :func:`_finite`. Snapshots whose product has no canonical
+    category are skipped. Rows are returned sorted by category for deterministic
+    output.
+    """
+
+    records: list[dict] = []
+    for snapshot in snapshots:
+        product = products.get(snapshot.product_id)
+        category = product.category if product is not None else None
+        if not category:
+            continue
+        records.append(
+            {
+                "category": category,
+                "displayed_price": snapshot.displayed_price,
+                "discount_pct": snapshot.discount_pct,
+                "rating": snapshot.rating,
+                "rating_count": snapshot.rating_count,
+            }
+        )
+
+    if not records:
+        return []
+
+    frame = pd.DataFrame.from_records(records)
+
+    stats: list[CategoryPriceStats] = []
+    for category, group in frame.groupby("category", sort=True):
+        price = group["displayed_price"].astype(float)
+        discount = group["discount_pct"].dropna().astype(float)
+        rating = group["rating"].dropna().astype(float)
+        rating_count = group["rating_count"].dropna().astype(float)
+
+        stats.append(
+            CategoryPriceStats(
+                category=str(category),
+                mean_price=_finite(price.mean()),
+                median_price=_finite(price.median()),
+                std_price=_finite(price.std(ddof=1)),
+                p25_price=_finite(price.quantile(0.25)),
+                p75_price=_finite(price.quantile(0.75)),
+                mean_discount_pct=_finite(discount.mean()),
+                std_discount_pct=_finite(discount.std(ddof=1)),
+                mean_rating=_finite(rating.mean()),
+                mean_rating_count=_finite(rating_count.mean()),
+                sample_size=int(len(group)),
+            )
+        )
+    return stats
+
+
+def _stat_summary(row: CategoryPriceStats) -> dict:
+    """Snapshot a stats row into a plain dict for the run report.
+
+    Read while the ORM object is still transient (pre-commit), so the values are
+    the freshly computed Python floats rather than a post-commit reload.
+    """
+
+    return {
+        "category": row.category,
+        "sample_size": row.sample_size,
+        "mean_price": row.mean_price,
+        "median_price": row.median_price,
+        "std_price": row.std_price,
+        "p25_price": row.p25_price,
+        "p75_price": row.p75_price,
+        "mean_discount_pct": row.mean_discount_pct,
+        "std_discount_pct": row.std_discount_pct,
+        "mean_rating": row.mean_rating,
+        "mean_rating_count": row.mean_rating_count,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------
 def _clear_core_tables(session) -> None:
-    """Delete the four populated tables, children before parents (idempotency).
+    """Delete the five populated tables, children before parents (idempotency).
 
     ``price_snapshots``, ``platform_prices``, and ``pack_size_history`` all hold a
     foreign key onto ``products``, so they are emptied first. ``category_price_stats``
-    and ``category_seasonality`` are intentionally left untouched (tasks 3.3 / 3.4).
+    is keyed by category (not a real FK) and is cleared here too so task 3.3's
+    output is replaced on every run. ``category_seasonality`` is intentionally
+    left untouched (task 3.4).
     """
 
     from sqlalchemy import delete
@@ -520,6 +649,7 @@ def _clear_core_tables(session) -> None:
     session.execute(delete(PlatformPrice))
     session.execute(delete(PackSizeHistory))
     session.execute(delete(Product))
+    session.execute(delete(CategoryPriceStats))
     session.commit()
 
 
@@ -554,12 +684,22 @@ def run_ingestion(directory: Path, session) -> IngestCounts:
     _load_pack_size_history(directory, known_ids, pack_rows, counts)
     session.add_all(pack_rows)
 
+    # Reduce the loaded snapshots into per-category distribution statistics and
+    # persist them in the same transaction as the core rows (task 3.3, Req 2.3).
+    # Computed from the in-memory snapshot objects while their attributes are
+    # still live (pre-commit), so the stats reflect exactly the cleaned rows
+    # being written and no post-commit reload is needed.
+    category_stats = _compute_category_stats(products, snapshots)
+    counts.category_stats = [_stat_summary(row) for row in category_stats]
+    session.add_all(category_stats)
+
     session.commit()
 
     counts.products = len(products)
     counts.price_snapshots = len(snapshots)
     counts.platform_prices = len(platform_prices)
     counts.pack_size_history = len(pack_rows)
+    counts.category_price_stats = len(category_stats)
     counts.categories = sorted({p.category for p in products.values() if p.category})
     return counts
 
@@ -625,14 +765,30 @@ def _print_report(counts: IngestCounts, directory: Path) -> None:
     print(f"Database URL     : {os.environ.get('DATABASE_URL', '(default from settings)')}")
     print("-" * 60)
     print("Inserted rows:")
-    print(f"  products           : {counts.products}")
-    print(f"  price_snapshots    : {counts.price_snapshots}")
-    print(f"  platform_prices    : {counts.platform_prices}")
-    print(f"  pack_size_history  : {counts.pack_size_history}")
+    print(f"  products            : {counts.products}")
+    print(f"  price_snapshots     : {counts.price_snapshots}")
+    print(f"  platform_prices     : {counts.platform_prices}")
+    print(f"  pack_size_history   : {counts.pack_size_history}")
+    print(f"  category_price_stats: {counts.category_price_stats}")
     print("-" * 60)
     print("Normalized categories:")
     for slug in counts.categories:
         print(f"  - {slug}")
+    if counts.category_stats:
+        print("-" * 60)
+        print("Category price statistics (displayed price; Req 2.3):")
+        print(
+            f"  {'category':<24}{'n':>4}{'mean':>10}{'median':>10}"
+            f"{'std':>10}{'p25':>10}{'p75':>10}{'disc%':>8}{'rating':>8}"
+        )
+        for stat in counts.category_stats:
+            print(
+                f"  {stat['category']:<24}{stat['sample_size']:>4}"
+                f"{stat['mean_price']:>10.2f}{stat['median_price']:>10.2f}"
+                f"{stat['std_price']:>10.2f}{stat['p25_price']:>10.2f}"
+                f"{stat['p75_price']:>10.2f}{stat['mean_discount_pct']:>8.2f}"
+                f"{stat['mean_rating']:>8.2f}"
+            )
     dropped = (
         counts.dropped_amazon
         + counts.dropped_flipkart
