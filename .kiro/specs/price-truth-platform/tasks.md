@@ -101,7 +101,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Load the serialized model into FastAPI app state at startup (in `main.py`) and expose a reusable `predict_proba` in `app/ml/discount_model.py`; ensure the model is loaded exactly once per process
     - _Requirements: 2.3, 11.2, 12.4_
 
-  - [x] 4.5 Implement the SHAP explainer with plain-language labels
+  - [ ] 4.5 Implement the SHAP explainer with plain-language labels
     - In `app/ml/explainer.py`, build a single `shap.TreeExplainer` from the same loaded model instance; return base value and per-feature contributions in margin space
     - Add `app/ml/feature_labels.py` mapping raw feature names to plain-language labels
     - _Requirements: 3.1, 3.4, 3.5_
@@ -157,7 +157,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - _Requirements: 9.2, 9.3, 15.2_
 
 - [ ] 8. True Discount Checker and SHAP explainability
-  - [ ] 8.1 Implement the discount scoring and banding service
+  - [x] 8.1 Implement the discount scoring and banding service
     - In `app/services/discount_service.py`, read `category_price_stats`, engineer features, call inference, map `p(genuine)` to `genuineness_score = round(p*100)` in [0,100], assign bands (>=90 genuine, 60-89 moderate, <60 likely_inflated), and compute effective discount pct
     - Handle pre-conditions: missing/<=displayed reference to not-evaluable with reason; missing category stats to limited-verification result with price context and no score
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
@@ -217,7 +217,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Cover single-platform no-comparison (7.5) and no-platform unavailable (7.6) responses
     - _Requirements: 7.5, 7.6_
 
-- [ ] 11. Buy Timing Signal service and endpoint
+- [x] 11. Buy Timing Signal service and endpoint
   - [x] 11.1 Implement the seasonality module and buy-timing service
     - In `app/ml/seasonality.py`, build/read the category seasonal profile (Prophet/statsmodels fit where a monthly index exists, else the Indian sale-calendar prior); in `app/services/buy_timing_service.py`, return `buy_now`/`wait`, attach the deepest-discount window on `wait`, always attach the category-level + snapshot-data disclosure statement, and return unavailable when no profile exists
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 10.1_
@@ -226,15 +226,15 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - **Property 16: Buy-timing output is category-level, bounded, and disclosed** - _Validates: Requirements 6.1, 6.3, 6.4, 10.1_
     - **Property 17: A "wait" recommendation points to the deepest-discount window** - _Validates: Requirements 6.2_
 
-  - [ ] 11.3 Implement the buy-timing endpoint
+  - [x] 11.3 Implement the buy-timing endpoint
     - Add `GET /api/v1/buy-timing/{category}` in `app/api/v1/buy_timing.py`; register the router
     - _Requirements: 6.1, 6.4, 14.4_
 
-  - [ ]* 11.4 Write unit tests for buy-timing
+  - [x]* 11.4 Write unit tests for buy-timing
     - Cover the no-seasonality unavailable message and that the sale calendar contains the four named events
     - _Requirements: 6.5, 6.6_
 
-- [ ] 12. Product Search service and endpoints
+- [x] 12. Product Search service and endpoints
   - [x] 12.1 Implement the search service and manual entry
     - In `app/services/search_service.py`, match `products.normalized_name` via Postgres trigram/`ILIKE`, returning name/brand/category per match; empty query to prompt message; zero matches to no-results message + manual-entry affordance; expose a `SelectedProduct` accepted by every feature module; accept manual entry (name, displayed price, reference price, pack quantity) through the same validation
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
@@ -242,11 +242,11 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
   - [x]* 12.2 Write property test for search result shaping
     - **Property 1: Search results always carry identifying fields** - _Validates: Requirements 1.2_
 
-  - [ ] 12.3 Implement the search and manual-entry endpoints
+  - [x] 12.3 Implement the search and manual-entry endpoints
     - Add `GET /api/v1/search?q=` and `POST /api/v1/manual-entry` in `app/api/v1/search.py`; cache search results under `search:{sha1(query)}`; register the router
     - _Requirements: 1.1, 1.5, 1.6, 14.4_
 
-  - [ ]* 12.4 Write unit/API tests for search
+  - [x]* 12.4 Write unit/API tests for search
     - Cover empty-query prompt, no-results + manual-entry message, and the 3-second result contract
     - _Requirements: 1.1, 1.4, 1.5_
 
@@ -255,7 +255,7 @@ Tasks marked with `*` are optional test sub-tasks (property, unit, integration, 
     - Add `GET /api/v1/dashboard/{product_id}` in `app/api/v1/dashboard.py` that calls each feature service independently, wrapping each in try/except so one failing module returns its unavailable payload while the others succeed; register the router
     - _Requirements: 8.1, 8.5, 15.1_
 
-  - [ ] 13.2 Implement the data-sources disclosure endpoint
+  - [x] 13.2 Implement the data-sources disclosure endpoint
     - Add `GET /api/v1/data-sources` in `app/api/v1/meta.py` describing data sources and known limitations, the crowd-sourced OFF notice, the category-level/snapshot disclosure, and the statement that live Amazon/Flipkart scraping is not a core data source
     - _Requirements: 10.2, 10.3, 10.4_
 

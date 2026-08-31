@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
-from app.api.v1 import cross_platform, meta, shrinkflation, unit_price
+from app.api.v1 import buy_timing, cross_platform, meta, search, shrinkflation, unit_price
 from app.core.errors import AppError, ErrorPayload
 from app.core.logging import get_logger
 from app.ml.discount_model import get_model
@@ -181,6 +181,12 @@ app.include_router(shrinkflation.router, prefix="/api/v1", tags=["Shrinkflation"
 
 # Cross-Platform Aggregator: GET /api/v1/cross-platform/{product_id} (Req 7.1, 7.3, 14.4).
 app.include_router(cross_platform.router, prefix="/api/v1", tags=["Cross-Platform"])
+
+# Buy Timing Signal: GET /api/v1/buy-timing/{category} (Req 6.1, 6.4, 14.4).
+app.include_router(buy_timing.router, prefix="/api/v1", tags=["Buy Timing"])
+
+# Product Search: GET /api/v1/search + POST /api/v1/manual-entry (Req 1.1, 1.5, 1.6, 14.4).
+app.include_router(search.router, prefix="/api/v1", tags=["Search"])
 
 
 # Import routers (will be added in later phases)
